@@ -27,13 +27,11 @@
 #include "EllipseAnimNode.h" // animation - change of scale
 #include "RotationAnimNode.h"// animation transformation
 
-#define TITLE "Seminar 6 - Scene Graph"
+#define TITLE "BI-PGR"
 
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
-#define MIG_FILE_NAME "./data/MiG25/MiG25.obj"
-#define CESSNA_FILE_NAME pgr::frameworkRoot() + "data/cessna.obj"
-#define JEEP_FILE_NAME pgr::frameworkRoot() + "data/Jeep/Jeep.obj"
+#define BOTTLE_FILE_NAME "./data/bottle/bottle.obj"
 
 // scene graph root node
 SceneNode *        rootNode_p      = NULL; // scene root
@@ -46,6 +44,8 @@ RotationAnimNode*  jeep_rot       = NULL;
 #define   RADIUS_B   15.0
 
 const glm::quat ORIENTATION_FROM_Z_PLUS =  glm::quat(-0.994f, -0.030f,   0.027f,  -0.014f );
+const glm::vec3 CAMERA1 =  glm::vec3(0.0f, 0.0f, -51.0f);
+const glm::vec3 CAMERA2 =  glm::vec3(0.0f, 0.0f, -30.0f);
 
 // global variables
 float     g_aspect_ratio = 1.0f;
@@ -58,6 +58,8 @@ glm::vec3 g_translation;
 
 glm::quat g_curOrientation,         // current camera Orientation   
           g_incQuat;                // increment quaternion (during mouse rotation)
+
+bool      freeCam = false;
 
 void FuncTimerCallback(int)
 {
@@ -182,7 +184,7 @@ glm::quat trackball( int p1_x, int p1_y, int p2_x, int p2_y, int w, int h )
 
 void myMouse( int button, int state, int x, int y)
 {
-  if( button == GLUT_LEFT_BUTTON )
+  if(freeCam && button == GLUT_LEFT_BUTTON)
   {
     if( state == GLUT_DOWN )
     {
@@ -228,7 +230,7 @@ void createTerrain()
   TransformNode* terrain_transform = new TransformNode("terrainTranf", rootNode_p);
 
   terrain_transform->translate(glm::vec3(0.0, -17, 0.0));
-  terrain_transform->scale(glm::vec3(80.0, 20.0, 80.0));
+  terrain_transform->scale(glm::vec3(80.0, 0.01, 80.0));
 
   if(!MeshManager::Instance()->exists(TERRAIN_FILE_NAME))
     MeshManager::Instance()->insert(TERRAIN_FILE_NAME, MeshGeometry::LoadRawHeightMap(TERRAIN_FILE_NAME));
@@ -238,56 +240,68 @@ void createTerrain()
   terrain_mesh_p->setGeometry(mesh_p);
 }
 
-void createJeep()
+void createBottle()
 {
-  // ======== BEGIN OF SOLUTION - TASK 1-1 ======== //
-  // create new TransformNode, use its rotate and translate methods and use it as a parent of the jeep node
-  TransformNode* jeep_transform = new TransformNode("jeepTranf", rootNode_p);
-  jeep_transform->translate(glm::vec3(0.0, -14, 0.0));
-  jeep_transform->rotate(-90,glm::vec3(1,0,0));
-  jeep_transform->scale(glm::vec3(4));
+  TransformNode* bottle_transform = new TransformNode("bottleTranf", rootNode_p);
+  bottle_transform->translate(glm::vec3(12.0, -13, -5.0));
+  //bottle_transform->rotate(-90,glm::vec3(1,0,0));
+  bottle_transform->scale(glm::vec3(4));
 
   
-  MeshGeometry* meshGeom_p = MeshManager::Instance()->get(JEEP_FILE_NAME);
-  jeep_mesh_p = new MeshNode("jeep", jeep_transform);
-  jeep_mesh_p->setGeometry(meshGeom_p);
-  // ========  END OF SOLUTION - TASK 1-1  ======== //
+  MeshGeometry* meshGeom_p = MeshManager::Instance()->get(BOTTLE_FILE_NAME);
+  MeshNode * bottle_mesh_p = new MeshNode("bottle", bottle_transform);
+  bottle_mesh_p->setGeometry(meshGeom_p);
 }
 
-void createCessna()
-{
-  const float A = 25;
-  const float B = 15;
 
-  // ======== BEGIN OF SOLUTION - TASK 1-2 ======== //
-  EllipseAnimNode* cessna_ellipse = new EllipseAnimNode("cessnaEllipse", rootNode_p);
-  cessna_ellipse->setAB(A,B);
-  cessna_ellipse->setAxis(glm::vec3(1,0,0),glm::vec3(0,0,1));
-
-  TransformNode* cessna_tran = new TransformNode("cessnaTranf", cessna_ellipse);
-  cessna_tran->rotate(90,glm::vec3(1,0,0));
-  cessna_tran->scale(glm::vec3(8));
-
-  MeshGeometry * meshGeom_p = MeshManager::Instance()->get(CESSNA_FILE_NAME);
-  MeshNode * cessna_mesh_p = new MeshNode("cessna", cessna_tran );
-  cessna_mesh_p->setGeometry(meshGeom_p);
-  // ========  END OF SOLUTION - TASK 1-2  ======== //
+void switchCam(int cam) {
+  switch (cam) {
+  case 1:
+	  g_translation = CAMERA1;
+	  g_curOrientation = ORIENTATION_FROM_Z_PLUS;
+	  freeCam = false;
+	  glutPostRedisplay();
+      break;
+  case 2:
+	  g_translation = CAMERA2;
+	  g_curOrientation = ORIENTATION_FROM_Z_PLUS;
+	  freeCam = false;
+	  glutPostRedisplay();
+      break;
+	case 3:
+	  freeCam = true;
+	  glutPostRedisplay();
+      break;
+  }
 }
 
-void createMig()
+
+//event processing of the menu commands
+void myMenu(int item)
 {
-  // ======== BEGIN OF SOLUTION - TASK 1-3 ======== //
-  RotationAnimNode* mig_rotation = new RotationAnimNode("migRotation", rootNode_p);
-  mig_rotation->setSpeed(1);
-  mig_rotation->setAxis(glm::vec3(0,1,0));
+  switch( item )
+  {
+    case 1:
+    case 2:
+    case 3:
+      switchCam(item);
+      break;
+  }
+  glutPostRedisplay();
+}
 
-  TransformNode* mig_tran = new TransformNode("migTranf", mig_rotation);
-  mig_tran->translate(glm::vec3(-1,0,0));
+// menu preparation
+void createMenu(void)
+{
+  int submenuID = glutCreateMenu( myMenu );
+  glutAddMenuEntry("Static 1", 1);
+  glutAddMenuEntry("Static 2", 2);
+  glutAddMenuEntry("Free camera", 3);
 
-  MeshGeometry * meshGeom_p = MeshManager::Instance()->get(MIG_FILE_NAME);
-  MeshNode * mig_mesh_p = new MeshNode("mig", mig_tran);
-  mig_mesh_p->setGeometry(meshGeom_p);
-  // ========  END OF SOLUTION - TASK 1-3  ======== //
+  glutCreateMenu(myMenu);
+  glutAddSubMenu("Camera", submenuID );
+
+  glutAttachMenu( GLUT_RIGHT_BUTTON );
 }
 
 void initializeScene()
@@ -300,9 +314,10 @@ void initializeScene()
 
   createTerrain();
 
-  createJeep();
-  createCessna();
-  createMig();
+  //createJeep();
+  //createCessna();
+  //createMig();
+  createBottle();
 
   // dump our scene graph tree for debug
   rootNode_p->dump();
@@ -341,41 +356,17 @@ void myKeyboard(unsigned char key, int x, int y)
     case 27:
       exit(0);//glutLeaveMainLoop();
       break;
-    case'x':
-      g_translation.x += 0.5;
-      glutPostRedisplay();
+    case'n':
+	case'N':
+	  switchCam(2);
       break;
-    case'X':
-      g_translation.x -= 0.5;
-      glutPostRedisplay();
+	case'b':
+	case'B':
+	  switchCam(1);
       break;
-    case'y':
-      g_translation.y += 0.5;
-      glutPostRedisplay();
-      break;
-    case'Y':
-      g_translation.y -= 0.5;
-      glutPostRedisplay();
-      break;
-    case'z':
-      g_translation.z += 0.5;
-      glutPostRedisplay();
-      break;
-    case'Z':
-      g_translation.z -= 0.5;
-      glutPostRedisplay();
-      break;
-    case 's':
-      jeep_rot->setSpeed(0.0f);
-      break;
-    case 'S': 
-      jeep_rot->setSpeed(M_PI / 10.0f);
-      //glutPostRedisplay();
-      break;
-    case 'r':
-    case 'R':   // reset of the view
-      g_curOrientation = ORIENTATION_FROM_Z_PLUS;
-      glutPostRedisplay();
+	case'f':
+	case'F':
+	  switchCam(3);
       break;
   }
 }
@@ -386,7 +377,7 @@ void init()
   initializeScene();
   g_curOrientation = ORIENTATION_FROM_Z_PLUS; 
 
-  g_translation    = glm::vec3(0.0f, 0.0f, -51.0f);
+  g_translation    = CAMERA1;
 
   //glDisable(GL_CULL_FACE); // draw both back and front faces
   glCullFace(GL_BACK);
@@ -399,9 +390,41 @@ void mySpecialKeyboard(int specKey, int x, int y)
 {
   switch (specKey)
   {
+    case GLUT_KEY_LEFT:
+      if (freeCam) {
+		  g_translation.x += 0.5;
+		  glutPostRedisplay();
+	  }
+      break;
+    case GLUT_KEY_RIGHT:
+	  if (freeCam) {
+		  g_translation.x -= 0.5;
+		  glutPostRedisplay();
+	  }
+      break;
+    case GLUT_KEY_PAGE_DOWN:
+	  if (freeCam) {
+		  g_translation.y += 0.5;
+		  glutPostRedisplay();
+	  }
+      break;
+    case GLUT_KEY_PAGE_UP:
+	  if (freeCam) {
+		  g_translation.y -= 0.5;
+		  glutPostRedisplay();
+	  }
+      break;
     case GLUT_KEY_UP:
+	  if (freeCam) {
+		  g_translation.z += 0.5;
+		  glutPostRedisplay();
+	  }
       break;
     case GLUT_KEY_DOWN:
+	  if (freeCam) {
+		  g_translation.z -= 0.5;
+		  glutPostRedisplay();
+	  }
       break;
   }
 }
@@ -420,7 +443,7 @@ int main(int argc, char** argv)
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
   // initial window size
   glutInitWindowSize(800, 600);
-  glutInitWindowPosition(800,100);
+  //glutInitWindowPosition(0,0);
   glutCreateWindow(TITLE);
 
   // register callback for drawing a window contents
@@ -434,6 +457,7 @@ int main(int argc, char** argv)
   glutMotionFunc(myMotion);
   glutTimerFunc(33, FuncTimerCallback, 0);
 
+  createMenu();
   if(!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR))
     pgr::dieWithError("pgr init failed, required OpenGL not supported?");
 

@@ -21,10 +21,6 @@
 #include "sceneGraph/MeshGeometry.h"
 #include "sceneGraph/AxesNode.h" // coordinate axes
 
-// nodes derived from scene graph nodes
-#include "EllipseAnimNode.h" // animation - change of scale
-#include "RotationAnimNode.h"// animation transformation
-
 #define TITLE "BI-PGR"
 
 // file name used during the scene graph creation

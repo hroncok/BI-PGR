@@ -31,7 +31,7 @@
 SceneNode * rootNode_p = NULL; // scene root
 
 // Constants for views
-const glm::quat ORIENTATION_FROM_Z_PLUS = glm::quat(-0.994f, -0.030f,   0.027f,  -0.014f );
+const glm::quat ORIENTATION_FROM_Z_PLUS = glm::quat(-0.994f, -0.030f,   0.027f,  -0.014f);
 const glm::vec3 CAMERA1 = glm::vec3(0.0f, 0.0f, -51.0f);
 const glm::vec3 CAMERA2 = glm::vec3(0.0f, 0.0f, -30.0f);
 

@@ -89,8 +89,6 @@
     <ClCompile Include="sceneGraph\ShaderProgram.cpp" />
     <ClCompile Include="sceneGraph\MeshGeometry.cpp" />
     <ClCompile Include="sceneGraph.cpp" />
-    <ClCompile Include="RotationAnimNode.cpp" />
-    <ClCompile Include="EllipseAnimNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sceneGraph\AxesNode.h" />
@@ -100,8 +98,6 @@
     <ClInclude Include="sceneGraph\TransformNode.h" />
     <ClInclude Include="sceneGraph\ShaderProgram.h" />
     <ClInclude Include="sceneGraph\MeshGeometry.h" />
-    <ClInclude Include="EllipseAnimNode.h" />
-    <ClInclude Include="RotationAnimNode.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sceneGraph/MeshNode.frag" />

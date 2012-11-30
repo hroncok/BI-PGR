@@ -86,103 +86,6 @@ void functionDraw() {
 		rootNode_p->draw(view, projection);
 }
 
-#define TRACKBALLSIZE  (0.8f)
-
-// Project a 2D point in screen space [pixels] onto a deformed sphere to get a 3D point on the unit sphere
-glm::vec3 projectToSphere(int p_x, int p_y, int w, int h) {
-	//Project the point to sphere
-	glm::vec3 v;
-
-	// point in the xy plane [-1..1]^2
-	v.x = (float)(2 * p_x   - w) / w;	// window [x,y] position to intrerval <-1,1> relatively to the window size
-	v.y = (float)(h - 2.0 * p_y) / h;	// convert to interval -1..1
-	v.z = 0;							// is recomputed below!!
-
-	//Point on a deformed unit sphere d^2 + (v.z)^2 = R^2, R=1
-	float d = glm::length( v );			// distance from point to the center of the circle in xy plane
-	#if 0
-		if( d > 1.0 )					// point will be in the circle (d must be < R => z > 0), or on  it (d=R => z=0)
-			d = 1.0;					// point out put back to the R=1 circle in xy plane
-		v.z = (float)sqrt( 1.00 - d*d);	// compute z of the 3D point on the sphere 
-	#else
-		float r = TRACKBALLSIZE;		// without uncomfort movement in the screen corners
-		if (d < r * 0.70710678118654752440f) {	/* Inside sphere */
-			v.z = sqrt(r*r - d*d);
-		} else {								/* On hyperbola */
-			float t = r / 1.41421356237309504880f;
-			v.z = t*t / d;
-		}
-	#endif
-	//change the point to a unit vector
-	v /= glm::length(v); //normalize - normalization of points outside the circle (the othes have already length one)
-	
-	return v;
-}
-
-// Given an axis and angle, compute quaternion
-glm::quat axisAngleToQuat(const float angle, const glm::vec3 axis) {
-	float s = (float) sin(angle / 2.0);
-	float c = (float) cos(angle / 2.0);
-	glm::vec3 dir = glm::normalize(axis);
-	dir *= s;
-	return glm::quat(c, dir); 
-}
-
-
-glm::quat trackball(int p1_x, int p1_y, int p2_x, int p2_y, int w, int h) {
-	glm::vec3 v1, v2;
-	float t;
-	float phi;
-	
-	if (p1_x == p2_x && p1_y == p2_y) {
-		return glm::quat(); // (1.0, 0.0, 0.0, 0.0); // Zero rotation
-	} else {
-		v1 = projectToSphere(p1_x, p1_y, w, h);
-		v2 = projectToSphere(p2_x, p2_y, w, h);
-		
-		glm::vec3 axis = glm::cross( v1, v2 ); // should be normaized, but it isn't...
-		
-		// determine, what angle to rotate
-		t = glm::length(v1 - v2) / 2.0f; 
-		
-		if( t >  1.0 )
-			t =  1.0; 
-		if( t < -1.0 )
-			t = -1.0;
-		
-		phi = 2.0f * asin(t);
-		
-		return axisAngleToQuat( phi, axis );
-	}
-}
-
-void myMouse(int button, int state, int x, int y) {
-	if(freeCam && button == GLUT_LEFT_BUTTON) {
-		if( state == GLUT_DOWN ) {
-			g_rotationOn = true;
-			g_mouse_old_x = x; // updated in myMotion
-			g_mouse_old_y = y;
-		} else {
-			g_rotationOn = false;
-		}
-		glutPostRedisplay();
-	}
-}
-
-// trackball pomoci kvaternionu / viz MesaDemos, soubory trackball.h a trackball.c
-// Vzdy pocita mouse_old_xy jen od predchoziho volani myMotion, cili inkrementuje malicke kvaterniony
-//   odpovidajici posunuti od prechoziho volani myMotion (a ne od pozice pri zahajeni interakce)
-void myMotion( int x, int y) {
-	if( g_rotationOn ) {
-		g_incQuat = trackball(g_mouse_old_x, g_mouse_old_y, x, y, g_win_w, g_win_h);
-		g_curOrientation = g_incQuat * g_curOrientation;
-		
-		g_mouse_old_x = x;
-		g_mouse_old_y = y;
-	}
-	glutPostRedisplay();
-}
-
 // helper function - creates AxesNode and attaches is to supplied parent
 SceneNode * createAxes(const std::string & name = "axes", float scale = 1, SceneNode * parent = NULL) {
 	TransformNode * axes_transform = new TransformNode(name + "_scale", parent);
@@ -261,17 +164,8 @@ void createMenu(void) {
 void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
-	
-	// you can uncomment this to display origin of the scene
-	//createAxes("scene_axes", 1.0f, rootNode_p);
-	
 	createTerrain();
-	
-	//createJeep();
-	//createCessna();
-	//createMig();
 	createBottle();
-	
 	// dump our scene graph tree for debug
 	rootNode_p->dump();
 }
@@ -395,8 +289,8 @@ int main(int argc, char** argv) {
 	// register callback for keyboard
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecialKeyboard);
-	glutMouseFunc(myMouse);
-	glutMotionFunc(myMotion);
+	//glutMouseFunc(myMouse);
+	//glutMotionFunc(myMotion);
 	glutTimerFunc(33, FuncTimerCallback, 0);
 	
 	createMenu();

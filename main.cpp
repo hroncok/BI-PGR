@@ -30,22 +30,33 @@
 // scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
 
-// Constants for views
-const glm::quat ORIENTATION_FROM_Z_PLUS = glm::quat(-0.994f, -0.030f,   0.027f,  -0.014f);
-const glm::vec3 CAMERA1 = glm::vec3(0.0f, 0.0f, -51.0f);
-const glm::vec3 CAMERA2 = glm::vec3(0.0f, 0.0f, -30.0f);
-
 // global variables
 float g_aspect_ratio = 1.0f;
-bool g_rotationOn = false; // mouse draging rotation
-int g_mouse_old_x; // updated in myMotion4
-int g_mouse_old_y;
 int g_win_w, g_win_h; // windowSize
-float g_scale;
-glm::vec3 g_translation;
-glm::quat g_curOrientation; // current camera Orientation   
-glm::quat g_incQuat; // increment quaternion (during mouse rotation)
 bool freeCam = false; // is the free camera motion available
+
+/// animation time step for glutTimer
+const int TIMER_STEP = 20;   // next event in [ms]
+
+/// use this constant when incrementing the camera pith and yaw
+const float CAMERA_ROTATION_DELTA = M_PI / 100.0f;
+/// this constant is used to modify the spinAngle variable
+const float ROTATION_DELTA = -M_PI / 500;
+/// use this to increment the camera position
+const float MOVE_DELTA = 0.2f;
+
+/// radius of the model circle (distance from the scene center)
+const float R = 3.0f;
+/// the axis of the model rotation
+const glm::vec3 spinAxis = glm::vec3(0.0, 1.0, 0.0);
+
+struct State {
+	glm::mat4 projection;
+	glm::vec3 cameraPosition;
+	float cameraYaw;
+	float cameraPitch;
+	glm::vec3 cameraDirection;
+} state;
 
 void FuncTimerCallback(int) {
 	// this is from screenGraph
@@ -59,38 +70,17 @@ void FuncTimerCallback(int) {
 	glutPostRedisplay();
 }
 
-void dumpMatrix(const char* title, const glm::mat4 m) {
-	printf("%s\n", title);
-	for(int i = 0; i < 4; i++)
-		printf(" %7.3f, %7.3f, %7.3f, %7.3f \n", m[0][i], m[1][i], m[2][i], m[3][i]);
-}
-
-void dumpQuat(const char* title, glm::quat q) {
-	printf("%s\n", title);
-	printf("Quat: %s: = [ %7.3f, %7.3f, %7.3f, %7.3f ]\n", title, q.x, q.y, q.z, q.w);
-}
-
 void functionDraw() {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 projection =  glm::perspective(60.0f, g_aspect_ratio, 1.0f, 10000.0f);
 
-	glm::mat4 view = glm::mat4(1.0);
-	view = glm::translate( view, g_translation);
-	view *= glm::mat4_cast(g_curOrientation); // function converts a quaternion into a 4x4 rotation matrix
-
-	//dumpQuat("g_curOrientation", g_curOrientation);
+	glm::mat4 view(1.0f);
+	view = glm::lookAt(state.cameraPosition,state.cameraDirection+state.cameraPosition,glm::vec3(0,1,0));
 
 	if(rootNode_p)
 		rootNode_p->draw(view, projection);
-}
-
-// helper function - creates AxesNode and attaches is to supplied parent
-SceneNode * createAxes(const std::string & name = "axes", float scale = 1, SceneNode * parent = NULL) {
-	TransformNode * axes_transform = new TransformNode(name + "_scale", parent);
-	axes_transform->scale(glm::vec3(scale));
-	return new AxesNode(name, axes_transform);
 }
 
 void createTerrain() {
@@ -118,23 +108,35 @@ void createBottle() {
 	bottle_mesh_p->setGeometry(meshGeom_p);
 }
 
+void calculateState(void) {
+	state.cameraDirection = glm::vec3(cos(state.cameraYaw),tan(state.cameraPitch),sin(state.cameraYaw));
+}
+
+void flushState(void) {
+	std::cout << "state.cameraPosition = glm::vec3(" << state.cameraPosition.x << "f, " << state.cameraPosition.y << "f, " << state.cameraPosition.x << "f);"  << std::endl;
+	std::cout << "state.cameraPitch = " << state.cameraPitch << "f;"  << std::endl;
+	std::cout << "state.cameraYaw = " << state.cameraYaw << "f;"  << std::endl;
+}
+
 void switchCam(int cam) {
 	switch (cam) {
 	case 1:
-		g_translation = CAMERA1;
-		g_curOrientation = ORIENTATION_FROM_Z_PLUS;
 		freeCam = false;
+		state.cameraPosition = glm::vec3(0.0f, -1.0f, 4.0f);
+		state.cameraYaw = -M_PI/2.0f;
+		state.cameraPitch = 0.0;
+		calculateState();
+		glutPostRedisplay();
 		break;
 	case 2:
-		g_translation = CAMERA2;
-		g_curOrientation = ORIENTATION_FROM_Z_PLUS;
 		freeCam = false;
+		calculateState();
+		glutPostRedisplay();
 		break;
 	case 3:
 		freeCam = true;
 		break;
 	}
-	glutPostRedisplay();
 }
 
 //event processing of the menu commands
@@ -145,19 +147,26 @@ void myMenu(int item) {
 	case 3:
 		switchCam(item);
 		break;
+	case 88:
+		flushState();
+		break;
+	case 99:
+		glutLeaveMainLoop();
+		break;
 	}
 }
 
 // menu preparation
 void createMenu(void) {
 	int submenuID = glutCreateMenu(myMenu);
-	glutAddMenuEntry("Static 1 [B]", 1);
-	glutAddMenuEntry("Static 2 [N]", 2);
-	glutAddMenuEntry("Free camera [F]", 3);
+	glutAddMenuEntry("Static 1        [B]", 1);
+	glutAddMenuEntry("Static 2        [N]", 2);
+	glutAddMenuEntry("Free camera     [F]", 3);
 	
 	glutCreateMenu(myMenu);
 	glutAddSubMenu("Camera", submenuID);
-	
+	glutAddMenuEntry("Debug info      [D]", 88);
+	glutAddMenuEntry("Exit          [Esc]", 99);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -170,34 +179,24 @@ void initializeScene() {
 	rootNode_p->dump();
 }
 
-//Called to update the display.
-//You should call glutSwapBuffers after all of your rendering to display what you rendered.
-//If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
 void display() {
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	functionDraw();
 	glutSwapBuffers();
+	CHECK_GL_ERROR();
 }
 
-//Called whenever the window is resized. The new window size is given, in pixels.
-//This is an opportunity to call glViewport or glScissor to keep up with the change in size.
 void reshape (int w, int h) {
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	g_aspect_ratio = (float)w/(float)h;
 	g_win_w = w;
 	g_win_h = h;
-	
-	// good place for perspective setup
-	// put to functionDraw(), based on g_aspect_ratio
 }
 
-// Called whenever a key on the keyboard was pressed.
-// The key is given by the ''key'' parameter, which is in ASCII.
-// It's often a good idea to have the escape key (ASCII value 27) call glutLeaveMainLoop() to
-// exit the program.
 void myKeyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 27:
-		exit(0);//glutLeaveMainLoop();
+		glutLeaveMainLoop();
 		break;
 	case'b':
 	case'B':
@@ -211,65 +210,49 @@ void myKeyboard(unsigned char key, int x, int y) {
 	case'F':
 		switchCam(3);
 		break;
+	case'd':
+	case'D':
+		flushState();
+		break;
 	}
 }
 
 void mySpecialKeyboard(int specKey, int x, int y) {
 	switch (specKey) {
 	case GLUT_KEY_LEFT:
-		if (freeCam) {
-			g_translation.x += 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraYaw -= CAMERA_ROTATION_DELTA;
 		break;
 	case GLUT_KEY_RIGHT:
-		if (freeCam) {
-			g_translation.x -= 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraYaw += CAMERA_ROTATION_DELTA;
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		if (freeCam) {
-			g_translation.y += 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraPitch -= CAMERA_ROTATION_DELTA;
 		break;
 	case GLUT_KEY_PAGE_UP:
-		if (freeCam) {
-			g_translation.y -= 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraPitch += CAMERA_ROTATION_DELTA;
 		break;
 	case GLUT_KEY_UP:
-		if (freeCam) {
-			g_translation.z += 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraPosition += MOVE_DELTA*state.cameraDirection;
 		break;
 	case GLUT_KEY_DOWN:
-		if (freeCam) {
-			g_translation.z -= 0.5;
-			glutPostRedisplay();
-		}
+		if (freeCam) state.cameraPosition -= MOVE_DELTA*state.cameraDirection;
 		break;
 	}
+	calculateState();
+	glutPostRedisplay();
 }
 
-// Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
 void init() {
 	initializeScene();
-	g_curOrientation = ORIENTATION_FROM_Z_PLUS; 
-	
-	g_translation = CAMERA1;
+	switchCam(1);
 	
 	//glDisable(GL_CULL_FACE); // draw both back and front faces
 	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE); // draw front faces  only
+	glEnable(GL_CULL_FACE); // draw front faces only
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 }
 
-// Entry point
 int main(int argc, char** argv) {
 	// initialize windonwing system
 	glutInit(&argc, argv);

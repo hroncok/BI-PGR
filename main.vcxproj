@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A4C1790E-2D56-413B-88F6-8407B3B31198}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>sceneGraph</RootNamespace>
+    <RootNamespace>main</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PGR_FRAMEWORK_ROOT)include;sceneGraph</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PGR_FRAMEWORK_ROOT)include;main</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -69,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PGR_FRAMEWORK_ROOT)include;sceneGraph</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PGR_FRAMEWORK_ROOT)include;main</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -81,27 +81,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="sceneGraph\AxesNode.cpp" />
-    <ClCompile Include="sceneGraph\MeshNode.cpp" />
-    <ClCompile Include="sceneGraph\Resources.cpp" />
-    <ClCompile Include="sceneGraph\SceneNode.cpp" />
-    <ClCompile Include="sceneGraph\TransformNode.cpp" />
-    <ClCompile Include="sceneGraph\ShaderProgram.cpp" />
-    <ClCompile Include="sceneGraph\MeshGeometry.cpp" />
-    <ClCompile Include="sceneGraph.cpp" />
+    <ClCompile Include="main\AxesNode.cpp" />
+    <ClCompile Include="main\MeshNode.cpp" />
+    <ClCompile Include="main\Resources.cpp" />
+    <ClCompile Include="main\SceneNode.cpp" />
+    <ClCompile Include="main\TransformNode.cpp" />
+    <ClCompile Include="main\ShaderProgram.cpp" />
+    <ClCompile Include="main\MeshGeometry.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sceneGraph\AxesNode.h" />
-    <ClInclude Include="sceneGraph\MeshNode.h" />
-    <ClInclude Include="sceneGraph\Resources.h" />
-    <ClInclude Include="sceneGraph\SceneNode.h" />
-    <ClInclude Include="sceneGraph\TransformNode.h" />
-    <ClInclude Include="sceneGraph\ShaderProgram.h" />
-    <ClInclude Include="sceneGraph\MeshGeometry.h" />
+    <ClInclude Include="main\AxesNode.h" />
+    <ClInclude Include="main\MeshNode.h" />
+    <ClInclude Include="main\Resources.h" />
+    <ClInclude Include="main\SceneNode.h" />
+    <ClInclude Include="main\TransformNode.h" />
+    <ClInclude Include="main\ShaderProgram.h" />
+    <ClInclude Include="main\MeshGeometry.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="sceneGraph/MeshNode.frag" />
-    <None Include="sceneGraph/MeshNode.vert" />
+    <None Include="main/MeshNode.frag" />
+    <None Include="main/MeshNode.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

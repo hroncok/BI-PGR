@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------------
 /**
- * \file    sceneGraph.cpp
+ * \file    main.cpp
  * \author  Tomas Barak, Vlastimil Havran, Jaroslav Sloup, Miroslav Hroncok
  */
 //----------------------------------------------------------------------------------------
@@ -14,12 +14,12 @@
 #include "pgr.h"   // includes all PGR libraries, like shader, glm, assimp ...
 
 // scene graph includes
-#include "sceneGraph/SceneNode.h" // superclass of all scene graph nodes
-#include "sceneGraph/TransformNode.h" // model transformation
-#include "sceneGraph/MeshNode.h" // model loaded from the file
-#include "sceneGraph/Resources.h"
-#include "sceneGraph/MeshGeometry.h"
-#include "sceneGraph/AxesNode.h" // coordinate axes
+#include "resources/SceneNode.h" // superclass of all scene graph nodes
+#include "resources/TransformNode.h" // model transformation
+#include "resources/MeshNode.h" // model loaded from the file
+#include "resources/Resources.h"
+#include "resources/MeshGeometry.h"
+#include "resources/AxesNode.h" // coordinate axes
 
 #define TITLE "BI-PGR"
 

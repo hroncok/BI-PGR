@@ -26,8 +26,8 @@ void MeshNode::loadProgram()
   if(!ShaderManager::Instance()->exists("MeshNode-shader"))
   {
     GLuint shaderList[] = {
-      pgr::createShaderFromFile(GL_VERTEX_SHADER,   "sceneGraph/MeshNode.vert"),
-      pgr::createShaderFromFile(GL_FRAGMENT_SHADER, "sceneGraph/MeshNode.frag"),
+      pgr::createShaderFromFile(GL_VERTEX_SHADER,   "resources/MeshNode.vert"),
+      pgr::createShaderFromFile(GL_FRAGMENT_SHADER, "resources/MeshNode.frag"),
       0
     };
 

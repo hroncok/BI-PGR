@@ -81,23 +81,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main\AxesNode.cpp" />
-    <ClCompile Include="main\MeshNode.cpp" />
-    <ClCompile Include="main\Resources.cpp" />
-    <ClCompile Include="main\SceneNode.cpp" />
-    <ClCompile Include="main\TransformNode.cpp" />
-    <ClCompile Include="main\ShaderProgram.cpp" />
-    <ClCompile Include="main\MeshGeometry.cpp" />
+    <ClCompile Include="resources\AxesNode.cpp" />
+    <ClCompile Include="resources\MeshNode.cpp" />
+    <ClCompile Include="resources\Resources.cpp" />
+    <ClCompile Include="resources\SceneNode.cpp" />
+    <ClCompile Include="resources\TransformNode.cpp" />
+    <ClCompile Include="resources\ShaderProgram.cpp" />
+    <ClCompile Include="resources\MeshGeometry.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main\AxesNode.h" />
-    <ClInclude Include="main\MeshNode.h" />
-    <ClInclude Include="main\Resources.h" />
-    <ClInclude Include="main\SceneNode.h" />
-    <ClInclude Include="main\TransformNode.h" />
-    <ClInclude Include="main\ShaderProgram.h" />
-    <ClInclude Include="main\MeshGeometry.h" />
+    <ClInclude Include="resources\AxesNode.h" />
+    <ClInclude Include="resources\MeshNode.h" />
+    <ClInclude Include="resources\Resources.h" />
+    <ClInclude Include="resources\SceneNode.h" />
+    <ClInclude Include="resources\TransformNode.h" />
+    <ClInclude Include="resources\ShaderProgram.h" />
+    <ClInclude Include="resources\MeshGeometry.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources/MeshNode.frag" />

@@ -100,8 +100,8 @@
     <ClInclude Include="main\MeshGeometry.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="main/MeshNode.frag" />
-    <None Include="main/MeshNode.vert" />
+    <None Include="resources/MeshNode.frag" />
+    <None Include="resources/MeshNode.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

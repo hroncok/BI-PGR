@@ -22,6 +22,9 @@
 #include "resources/AxesNode.h" // coordinate axes
 
 #define TITLE "BI-PGR"
+#define WIN_WIDTH 800
+#define WIN_HEIGHT 600
+#define PITCHLIM 1.55f // pi/2 - small
 
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
@@ -226,10 +229,16 @@ void mySpecialKeyboard(int specKey, int x, int y) {
 		if (freeCam) state.cameraYaw += CAMERA_ROTATION_DELTA;
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		if (freeCam) state.cameraPitch -= CAMERA_ROTATION_DELTA;
+		if (freeCam) {
+			state.cameraPitch -= CAMERA_ROTATION_DELTA;
+			if (state.cameraPitch < -PITCHLIM) state.cameraPitch = -PITCHLIM;
+		}
 		break;
 	case GLUT_KEY_PAGE_UP:
-		if (freeCam) state.cameraPitch += CAMERA_ROTATION_DELTA;
+		if (freeCam) {
+			state.cameraPitch += CAMERA_ROTATION_DELTA;
+			if (state.cameraPitch > PITCHLIM) state.cameraPitch = PITCHLIM;
+		}
 		break;
 	case GLUT_KEY_UP:
 		if (freeCam) state.cameraPosition += MOVE_DELTA*state.cameraDirection;
@@ -262,7 +271,7 @@ int main(int argc, char** argv) {
 	
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	// initial window size
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow(TITLE);
 	
 	// register callback for drawing a window contents

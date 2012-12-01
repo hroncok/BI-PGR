@@ -269,34 +269,23 @@ void init() {
 }
 
 int main(int argc, char** argv) {
-	// initialize windonwing system
 	glutInit(&argc, argv);
-	
 	glutInitContextVersion(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-	
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	// initial window size
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow(TITLE);
-	
-	// register callback for drawing a window contents
 	glutDisplayFunc(display);
-	// register callback for change of window
 	glutReshapeFunc(reshape);
-	// register callback for keyboard
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecialKeyboard);
 	//glutMouseFunc(myMouse);
 	//glutMotionFunc(myMotion);
 	glutTimerFunc(33, FuncTimerCallback, 0);
-	
 	createMenu();
 	if(!pgr::initialize(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR))
-		pgr::dieWithError("PGR init failed, required OpenGL not supported?");
-	
+		pgr::dieWithError("PGR init failed, now f*ck around and get another computer, cool huh?");
 	init();
-	
 	glutMainLoop();
 	return 0;
 }

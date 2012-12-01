@@ -18,7 +18,7 @@ struct Light {
 };
 
 Light light;
-uniform Light lights[2];
+uniform Light lights[1];
 
 smooth in vec3 normal_v;    // camera space normal
 smooth in vec3 position_v;  // camera space fragment position
@@ -107,7 +107,6 @@ void main()
   // accumulate contributions from all lights
   outputColor += directionalLight(sun, material, position_v, normal);
   outputColor += spotLight(lights[0], material, position_v, normal);
-  outputColor += spotLight(lights[1], material, position_v, normal);
 
   if(useTexture)
     outputColor =  outputColor * texture(texSampler, texCoord_v);

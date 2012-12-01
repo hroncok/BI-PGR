@@ -36,6 +36,7 @@ const int NUM_SPOT_LIGHTS = 1;
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
 #define BOTTLE_FILE_NAME "./data/bottle/bottle.obj"
+#define PATH_FILE_NAME "./data/path/path.obj"
 
 // scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
@@ -178,8 +179,8 @@ void functionDraw() {
 	}
 
 	// TODO Move it somewhere
-	state.refLights[0].position = view * glm::vec4(30.0f, 1.0f, 1.0f, 1.0f);
-	state.refLights[0].spotDirection = view * glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
+	state.refLights[0].position = view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
+	state.refLights[0].spotDirection = view * glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
 
 	if(rootNode_p)
 		rootNode_p->draw(view, projection);
@@ -199,11 +200,23 @@ void createTerrain() {
 	terrain_mesh_p->setGeometry(mesh_p);
 }
 
+void createPath() {
+	TransformNode* path_transform = new TransformNode("pathTranf", rootNode_p);
+	path_transform->translate(glm::vec3(0.0, -17.3, 0.0));
+	//path_transform->rotate(-90,glm::vec3(1,0,0));
+	path_transform->scale(glm::vec3(35,20,35));
+	
+	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(PATH_FILE_NAME);
+	MeshNode * path_mesh_p = new MeshNode("path", path_transform);
+	path_mesh_p->setGeometry(meshGeom_p);
+}
+
 void createBottle() {
 	TransformNode* bottle_transform = new TransformNode("bottleTranf", rootNode_p);
-	bottle_transform->translate(glm::vec3(12.0, -13, -5.0));
+	bottle_transform->translate(glm::vec3(10.0, -12.5, 5.0));
 	//bottle_transform->rotate(-90,glm::vec3(1,0,0));
 	bottle_transform->scale(glm::vec3(4));
+	// TODO Move the bottle along the path
 	
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(BOTTLE_FILE_NAME);
 	MeshNode * bottle_mesh_p = new MeshNode("bottle", bottle_transform);
@@ -282,6 +295,7 @@ void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
+	createPath();
 	createBottle();
 	// dump our scene graph tree for debug
 	rootNode_p->dump();

@@ -1,6 +1,6 @@
-# Blender v2.64 (sub 0) OBJ File: ''
+# Blender v2.64 (sub 0) OBJ File: 'bottle.blend'
 # www.blender.org
-mtllib untitled.mtl
+mtllib bottle.mtl
 o Bottle
 v -100.000000 -175.000000 0.000000
 v -99.802696 -175.000000 -6.279050
@@ -802,7 +802,7 @@ v -85.595100 -165.000000 -27.811501
 v -87.172501 -165.000000 -22.382099
 v -88.405899 -165.000000 -16.864300
 v -89.290298 -165.000000 -11.280000
-usemtl 
+usemtl Material.001
 s off
 f 1 2 3
 f 3 2 4

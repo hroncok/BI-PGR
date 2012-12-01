@@ -61,6 +61,8 @@ const float R = 3.0f;
 /// the axis of the model rotation
 const glm::vec3 spinAxis = glm::vec3(0.0, 1.0, 0.0);
 
+glm::vec4 reflector = glm::vec4(0.0f);
+
 struct Light {
 	glm::vec4 ambient;
 	glm::vec4 diffuse;
@@ -158,6 +160,12 @@ void reloadShader() {
 	CHECK_GL_ERROR();
 }
 
+void reflectorSwitch() {
+	std::cout << "" << std::endl;
+	if (reflector == glm::vec4(0.0f)) reflector = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+	else  reflector = glm::vec4(0.0f);
+	glutPostRedisplay();
+}
 
 void functionDraw() {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -178,9 +186,9 @@ void functionDraw() {
 		glUniform1f(resources.shaderProgram->m_lights[l].spotExponent, state.refLights[l].spotExponent);
 	}
 
-	// TODO Move it somewhere
+	// Position of the reflector
 	state.refLights[0].position = view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
-	state.refLights[0].spotDirection = view * glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+	state.refLights[0].spotDirection = view * reflector;
 
 	if(rootNode_p)
 		rootNode_p->draw(view, projection);
@@ -268,6 +276,9 @@ void myMenu(int item) {
 	case 3:
 		switchCam(item);
 		break;
+	case 77:
+		reflectorSwitch();
+		break;
 	case 88:
 		flushState();
 		break;
@@ -280,14 +291,16 @@ void myMenu(int item) {
 // menu preparation
 void createMenu(void) {
 	int submenuID = glutCreateMenu(myMenu);
-	glutAddMenuEntry("Static 1        [B]", 1);
-	glutAddMenuEntry("Static 2        [N]", 2);
-	glutAddMenuEntry("Free camera     [F]", 3);
+	glutAddMenuEntry("Static 1         [B]", 1);
+	glutAddMenuEntry("Static 2         [N]", 2);
+	glutAddMenuEntry("Free camera      [F]", 3);
 	
 	glutCreateMenu(myMenu);
 	glutAddSubMenu("Camera", submenuID);
-	glutAddMenuEntry("Debug info      [D]", 88);
-	glutAddMenuEntry("Exit          [Esc]", 99);
+
+	glutAddMenuEntry("Reflector on/off [R]", 77);
+	glutAddMenuEntry("Debug info       [D]", 88);
+	glutAddMenuEntry("Exit           [Esc]", 99);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -334,6 +347,10 @@ void myKeyboard(unsigned char key, int x, int y) {
 	case'd':
 	case'D':
 		flushState();
+		break;
+	case'r':
+	case'R':
+		reflectorSwitch();
 		break;
 	}
 }

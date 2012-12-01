@@ -8,11 +8,11 @@ uniform mat4 NormalMatrix; // inverse transposed VMmatrix
 in vec3 position;     // vertex position in world space
 in vec3 normal;       // vertex normal
 
-smooth out vec3 theNormal;    // camera space normal
-smooth out vec3 thePosition;  // camera space fragment position
+smooth out vec3 normal_v;    // camera space normal
+smooth out vec3 position_v;  // camera space fragment position
 
 in vec2 texCoord;			// incoming texture coordinates
-smooth out vec2 vTexCoord;	// outgoing texture coordinates
+smooth out vec2 texCoord_v;	// outgoing texture coordinates
 
 
 void main() {
@@ -25,8 +25,8 @@ void main() {
   vec3 VMnormal   = normalize( NormalMatrix * vec4(normal, 0.0) ).xyz;  //normal in eye coordinates by NormalMatrix
 
   // outputs entering the fragment shader
-  theNormal   = VMnormal;
-  thePosition = VMposition.xyz;
+  normal_v   = VMnormal;
+  position_v = VMposition.xyz;
 
-  vTexCoord = texCoord;
+  texCoord_v = texCoord;
 }

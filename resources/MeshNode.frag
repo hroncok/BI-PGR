@@ -20,6 +20,8 @@ struct Light {
 Light light;
 uniform Light lights[1];
 
+Light reflight = lights[0];
+
 smooth in vec3 normal_v;    // camera space normal
 smooth in vec3 position_v;  // camera space fragment position
 
@@ -92,13 +94,18 @@ void main()
   float sunSpeed = 0.2f;
 
   Light sun;
-  sun.ambient = vec3(0.0f);
+  //sun.ambient = vec3(0.0f);
   sun.diffuse = vec3(1.0f);
   sun.specular = vec3(1.0f);
+
+  // Disco!
+  if (int(floor(time*5)) % 2 == 0) reflight.diffuse = vec3(1.0f,0.0f,0.0f);
+
   // ======== BEGIN OF SOLUTION - TASK 1-2 ======== //
   // calculate correct direction to the sun using the time and sunSpeed variables
   // dont forget to translate the direction to the view coordinates (using Vmatrix)
    vec4 four = vec4(sin(time*sunSpeed), cos(time*sunSpeed), 0.0f, 0.0f) * Vmatrix;
+   sun.ambient = vec3(abs(cos(time*sunSpeed)));
    sun.position = four.xyz;
   // ========  END OF SOLUTION - TASK 1-2  ======== //
 
@@ -106,7 +113,7 @@ void main()
   vec4 outputColor = vec4(material.ambient * global_ambient, 0.0f);
   // accumulate contributions from all lights
   outputColor += directionalLight(sun, material, position_v, normal);
-  outputColor += spotLight(lights[0], material, position_v, normal);
+  outputColor += spotLight(reflight, material, position_v, normal);
 
   if(useTexture)
     outputColor =  outputColor * texture(texSampler, texCoord_v);

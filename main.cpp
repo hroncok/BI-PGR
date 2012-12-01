@@ -125,14 +125,17 @@ void switchCam(int cam) {
 	switch (cam) {
 	case 1:
 		freeCam = false;
-		state.cameraPosition = glm::vec3(0.0f, -1.0f, 4.0f);
-		state.cameraYaw = -M_PI/2.0f;
-		state.cameraPitch = 0.0;
+		state.cameraPosition = glm::vec3(-4.0f, 12.0f, -4.0f);
+		state.cameraYaw = -6.0f;
+		state.cameraPitch = -1.0f;
 		calculateState();
 		glutPostRedisplay();
 		break;
 	case 2:
 		freeCam = false;
+		state.cameraPosition = glm::vec3(83.0f, 21.0f, 83.0f);
+		state.cameraYaw = -8.7f;
+		state.cameraPitch = -0.2f;
 		calculateState();
 		glutPostRedisplay();
 		break;

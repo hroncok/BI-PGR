@@ -31,7 +31,7 @@
 #define WIN_HEIGHT 600
 #define PITCHLIM 1.55f // pi/2 - small
 
-const int NUM_SPOT_LIGHTS = 2;
+const int NUM_SPOT_LIGHTS = 1;
 
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
@@ -60,24 +60,21 @@ const float R = 3.0f;
 /// the axis of the model rotation
 const glm::vec3 spinAxis = glm::vec3(0.0, 1.0, 0.0);
 
-struct Light
-{
-  glm::vec4 ambient;
-  glm::vec4 diffuse;
-  glm::vec4 specular;
+struct Light {
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
 };
 
-struct DirectionalLight: public Light
-{
-  glm::vec4 direction;
+struct DirectionalLight: public Light {
+	glm::vec4 direction;
 };
 
-struct SpotLight: public Light
-{
-  glm::vec4 position;
-  glm::vec4 spotDirection;
-  float spotCosCutoff;
-  float spotExponent;
+struct SpotLight: public Light {
+	glm::vec4 position;
+	glm::vec4 spotDirection;
+	float spotCosCutoff;
+	float spotExponent;
 };
 
 struct State {
@@ -86,57 +83,52 @@ struct State {
 	float cameraYaw;
 	float cameraPitch;
 	glm::vec3 cameraDirection;
-	SpotLight jeepLights[2];
+	SpotLight refLights[2];
 } state;
 
 
 
-class LightingShader: public MeshShaderProgram
-{
+class LightingShader: public MeshShaderProgram {
 public:
-  struct LightLocations
-  {
-    GLint ambient;
-    GLint diffuse;
-    GLint specular;
-    GLint position;
-    GLint spotDirection;
-    GLint spotCosCutoff;
-    GLint spotExponent;
-  };
+	struct LightLocations {
+		GLint ambient;
+		GLint diffuse;
+		GLint specular;
+		GLint position;
+		GLint spotDirection;
+		GLint spotCosCutoff;
+		GLint spotExponent;
+	};
+	
+	LightingShader(GLint prId): MeshShaderProgram(prId) {}
+	
+	void initLocations() {
+		MeshShaderProgram::initLocations();
 
-  LightingShader(GLint prId): MeshShaderProgram(prId) {}
+		for(int l = 0; l < NUM_SPOT_LIGHTS; ++l) {
+			char buf[255];
+			snprintf(buf, 255, "lights[%i].ambient", l);
+			m_lights[l].ambient = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].diffuse", l);
+			m_lights[l].diffuse = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].specular", l);
+			m_lights[l].specular = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].position", l);
+			m_lights[l].position = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].spotDirection", l);
+			m_lights[l].spotDirection = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].spotCosCutoff", l);
+			m_lights[l].spotCosCutoff = glGetUniformLocation(m_programId, buf);
+			snprintf(buf, 255, "lights[%i].spotExponent", l);
+			m_lights[l].spotExponent = glGetUniformLocation(m_programId, buf);
+		}
+	}
 
-  void initLocations()
-  {
-    MeshShaderProgram::initLocations();
-
-    for(int l = 0; l < NUM_SPOT_LIGHTS; ++l)
-    {
-      char buf[255];
-      snprintf(buf, 255, "lights[%i].ambient", l);
-      m_lights[l].ambient = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].diffuse", l);
-      m_lights[l].diffuse = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].specular", l);
-      m_lights[l].specular = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].position", l);
-      m_lights[l].position = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].spotDirection", l);
-      m_lights[l].spotDirection = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].spotCosCutoff", l);
-      m_lights[l].spotCosCutoff = glGetUniformLocation(m_programId, buf);
-      snprintf(buf, 255, "lights[%i].spotExponent", l);
-      m_lights[l].spotExponent = glGetUniformLocation(m_programId, buf);
-    }
-  }
-
-  LightLocations m_lights[NUM_SPOT_LIGHTS];
+	LightLocations m_lights[NUM_SPOT_LIGHTS];
 };
 
-struct Resources
-{
-  LightingShader * shaderProgram;
+struct Resources {
+	LightingShader * shaderProgram;
 } resources;
 
 void FuncTimerCallback(int) {
@@ -176,20 +168,18 @@ void functionDraw() {
 	view = glm::lookAt(state.cameraPosition,state.cameraDirection+state.cameraPosition,glm::vec3(0,1,0));
 
 	for(int l = 0; l < NUM_SPOT_LIGHTS; ++l) {
-		glUniform3fv(resources.shaderProgram->m_lights[l].ambient, 1, glm::value_ptr(state.jeepLights[l].ambient));
-		glUniform3fv(resources.shaderProgram->m_lights[l].diffuse, 1, glm::value_ptr(state.jeepLights[l].diffuse));
-		glUniform3fv(resources.shaderProgram->m_lights[l].specular, 1, glm::value_ptr(state.jeepLights[l].specular));
-		glUniform3fv(resources.shaderProgram->m_lights[l].position, 1, glm::value_ptr(state.jeepLights[l].position));
-		glUniform3fv(resources.shaderProgram->m_lights[l].spotDirection, 1, glm::value_ptr(state.jeepLights[l].spotDirection));
-		glUniform1f(resources.shaderProgram->m_lights[l].spotCosCutoff, state.jeepLights[l].spotCosCutoff);
-		glUniform1f(resources.shaderProgram->m_lights[l].spotExponent, state.jeepLights[l].spotExponent);
+		glUniform3fv(resources.shaderProgram->m_lights[l].ambient, 1, glm::value_ptr(state.refLights[l].ambient));
+		glUniform3fv(resources.shaderProgram->m_lights[l].diffuse, 1, glm::value_ptr(state.refLights[l].diffuse));
+		glUniform3fv(resources.shaderProgram->m_lights[l].specular, 1, glm::value_ptr(state.refLights[l].specular));
+		glUniform3fv(resources.shaderProgram->m_lights[l].position, 1, glm::value_ptr(state.refLights[l].position));
+		glUniform3fv(resources.shaderProgram->m_lights[l].spotDirection, 1, glm::value_ptr(state.refLights[l].spotDirection));
+		glUniform1f(resources.shaderProgram->m_lights[l].spotCosCutoff, state.refLights[l].spotCosCutoff);
+		glUniform1f(resources.shaderProgram->m_lights[l].spotExponent, state.refLights[l].spotExponent);
 	}
 
-	state.jeepLights[0].position = view * glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
-	state.jeepLights[0].spotDirection = view * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-
-	state.jeepLights[1].position = view * glm::vec4(0.0f, 1.0f, -1.0f, 1.0f);
-	state.jeepLights[1].spotDirection = view * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+	// TODO Move it somewhere
+	state.refLights[0].position = view * glm::vec4(30.0f, 1.0f, 1.0f, 1.0f);
+	state.refLights[0].spotDirection = view * glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
 
 	if(rootNode_p)
 		rootNode_p->draw(view, projection);
@@ -368,16 +358,11 @@ void mySpecialKeyboard(int specKey, int x, int y) {
 void init() {
 	initializeScene();
 	reloadShader();
-	state.jeepLights[0].ambient = glm::vec4(0.0f);
-	state.jeepLights[0].diffuse = glm::vec4(1.0f);
-	state.jeepLights[0].specular = glm::vec4(1.0f);
-	state.jeepLights[0].spotCosCutoff = 0.7f;
-	state.jeepLights[0].spotExponent = 3.0f;
-	state.jeepLights[1].ambient = glm::vec4(0.0f);
-	state.jeepLights[1].diffuse = glm::vec4(1.0f);
-	state.jeepLights[1].specular = glm::vec4(1.0f);
-	state.jeepLights[1].spotCosCutoff = 0.7f;
-	state.jeepLights[1].spotExponent = 3.0f;
+	state.refLights[0].ambient = glm::vec4(0.0f);
+	state.refLights[0].diffuse = glm::vec4(1.0f);
+	state.refLights[0].specular = glm::vec4(1.0f);
+	state.refLights[0].spotCosCutoff = 0.7f;
+	state.refLights[0].spotExponent = 3.0f;
 	switchCam(1);
 	
 	//glDisable(GL_CULL_FACE); // draw both back and front faces

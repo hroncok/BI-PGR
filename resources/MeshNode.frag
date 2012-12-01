@@ -46,8 +46,19 @@ vec4 spotLight(Light light, Material material, vec3 position, vec3 normal)
   // the position and normal variables contain transformed surface position and normal 
   // store the ambient, diffuse and specular terms to the ret variable 
   // for spot lights, light.position contains the light position 
+  // vectors
+  vec3 vecLight = normalize(light.position - position);
+  vec3 vecReflection = reflect(normal, vecLight);
+  vec3 vecViewer = -normalize(position);
+  vec3 vecDirection = normalize(light.spotDirection); 
+  // light parts
+  if (dot(vecDirection, -vecLight) >= light.spotCosCutoff) { // if the light should be there
+    vec3 ambient = material.ambient * light.ambient;
+    vec3 diffuse = max(0.0f, dot(normal, vecLight)) * material.diffuse * light.diffuse;
+    vec3 specular = pow(max(0.0f, dot(vecReflection, vecViewer)), material.shininess) * material.specular * light.specular;
+    ret = (ambient+diffuse+specular) * pow(max(0.0f, dot(vecDirection, -vecLight)), light.spotExponent);
+  }
   // ========  END OF SOLUTION - TASK 2-1  ======== //
-
   return vec4(ret, 1.0f);
 }
 

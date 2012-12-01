@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "main.vcxproj", "{A4C1790E-2D56-413B-88F6-8407B3B31198}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "semestralka", "semestralka.vcxproj", "{A4C1790E-2D56-413B-88F6-8407B3B31198}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

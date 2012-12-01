@@ -113,6 +113,9 @@ void createBottle() {
 
 void calculateState(void) {
 	state.cameraDirection = glm::vec3(cos(state.cameraYaw),tan(state.cameraPitch),sin(state.cameraYaw));
+	//state.cameraDirection = glm::vec3(cos(state.cameraYaw)*cos(state.cameraPitch),sin(state.cameraPitch),sin(state.cameraYaw)*cos(state.cameraPitch));
+	// both works and acts the same, the second should be more right, but I like the forst one more
+	// both acts wierd when paged up/down over the top/bottom, so it is limited by PITCHLIM constant (little less than pi/2)
 }
 
 void flushState(void) {

@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <string.h>
 #include <iostream>
+#include <sstream>
 
 #include "pgr.h"   // includes all PGR libraries, like shader, glm, assimp ...
 
@@ -46,6 +47,7 @@ SceneNode * rootNode_p = NULL; // scene root
 float g_aspect_ratio = 1.0f;
 int g_win_w, g_win_h; // windowSize
 bool freeCam = false; // is the free camera motion available
+bool AnimNode::animation = true; // is the animation working
 
 /// animation time step for glutTimer
 const int TIMER_STEP = 20;   // next event in [ms]
@@ -162,11 +164,17 @@ void reloadShader() {
 }
 
 void reflectorSwitch() {
-	std::cout << "" << std::endl;
 	if (reflector == glm::vec4(0.0f)) reflector = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
 	else  reflector = glm::vec4(0.0f);
 	glutPostRedisplay();
 }
+
+void animationSwitch() {
+	AnimNode::animation = !AnimNode::animation;
+	//glutPostRedisplay();
+}
+
+
 
 void functionDraw() {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -220,17 +228,18 @@ void createPath() {
 	path_mesh_p->setGeometry(meshGeom_p);
 }
 
-void createBottle() {
+void createBottle(int index = 0, float offset = 0.0f) {
 	// Index the names so more bottles are possible
-	AnimNode* bottle_anim = new AnimNode("bottleAnim",rootNode_p);
-	
-	TransformNode* bottle_transform = new TransformNode("bottleTranf", bottle_anim);
+	std::stringstream ss; ss << index << std::flush;
+	AnimNode* bottle_anim = new AnimNode("bottleAnim"+ss.str(),offset,rootNode_p);
+
+	TransformNode* bottle_transform = new TransformNode("bottleTranf"+ss.str(), bottle_anim);
 	bottle_transform->translate(glm::vec3(0.0, -12.5, 0.0));
 	//bottle_transform->rotate(-90,glm::vec3(1,0,0));
 	bottle_transform->scale(glm::vec3(4));
 
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(BOTTLE_FILE_NAME);
-	MeshNode * bottle_mesh_p = new MeshNode("bottle", bottle_transform);
+	MeshNode * bottle_mesh_p = new MeshNode("bottle"+ss.str(), bottle_transform);
 	bottle_mesh_p->setGeometry(meshGeom_p);
 }
 
@@ -279,6 +288,9 @@ void myMenu(int item) {
 	case 3:
 		switchCam(item);
 		break;
+	case 66:
+		animationSwitch();
+		break;
 	case 77:
 		reflectorSwitch();
 		break;
@@ -301,6 +313,7 @@ void createMenu(void) {
 	glutCreateMenu(myMenu);
 	glutAddSubMenu("Camera", submenuID);
 
+	glutAddMenuEntry("Animation on/off [A]", 66);
 	glutAddMenuEntry("Reflector on/off [R]", 77);
 	glutAddMenuEntry("Debug info       [D]", 88);
 	glutAddMenuEntry("Exit           [Esc]", 99);
@@ -312,7 +325,9 @@ void initializeScene() {
 	rootNode_p = new SceneNode("root");
 	createTerrain();
 	//createPath();
-	createBottle();
+	for (int i=0; i < 20; i++) {
+		createBottle(i,i*0.15f);
+	}
 	// dump our scene graph tree for debug
 	rootNode_p->dump();
 }
@@ -354,6 +369,10 @@ void myKeyboard(unsigned char key, int x, int y) {
 	case'r':
 	case'R':
 		reflectorSwitch();
+		break;
+	case'a':
+	case'A':
+		animationSwitch();
 		break;
 	}
 }

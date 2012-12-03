@@ -21,6 +21,7 @@
 #include "resources/MeshGeometry.h"
 #include "resources/AxesNode.h" // coordinate axes
 #include "resources/ShaderProgram.h"
+#include "AnimNode.h"
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -220,12 +221,14 @@ void createPath() {
 }
 
 void createBottle() {
-	TransformNode* bottle_transform = new TransformNode("bottleTranf", rootNode_p);
-	bottle_transform->translate(glm::vec3(10.0, -12.5, 5.0));
+	// Index the names so more bottles are possible
+	AnimNode* bottle_anim = new AnimNode("bottleAnim",rootNode_p);
+	
+	TransformNode* bottle_transform = new TransformNode("bottleTranf", bottle_anim);
+	bottle_transform->translate(glm::vec3(0.0, -12.5, 0.0));
 	//bottle_transform->rotate(-90,glm::vec3(1,0,0));
 	bottle_transform->scale(glm::vec3(4));
-	// TODO Move the bottle along the path
-	
+
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(BOTTLE_FILE_NAME);
 	MeshNode * bottle_mesh_p = new MeshNode("bottle", bottle_transform);
 	bottle_mesh_p->setGeometry(meshGeom_p);
@@ -308,7 +311,7 @@ void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
-	createPath();
+	//createPath();
 	createBottle();
 	// dump our scene graph tree for debug
 	rootNode_p->dump();

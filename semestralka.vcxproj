@@ -81,6 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimNode.cpp" />
     <ClCompile Include="resources\AxesNode.cpp" />
     <ClCompile Include="resources\MeshNode.cpp" />
     <ClCompile Include="resources\Resources.cpp" />
@@ -91,6 +92,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimNode.h" />
     <ClInclude Include="resources\AxesNode.h" />
     <ClInclude Include="resources\MeshNode.h" />
     <ClInclude Include="resources\Resources.h" />

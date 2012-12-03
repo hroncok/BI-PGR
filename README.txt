@@ -28,7 +28,7 @@ Při zapnuté volné kameře je pohyb po scéně realizovaný pomocí kurozorov�
 ---- 
 
 ==== Konfigurace ==== 
-Součástí aplikace je konfigurační soubor, který umožňuje měnit body a vektory, které ovlivňují trasu a počet lahví.
+Součástí aplikace je konfigurační soubor config.txt, který umožňuje měnit body a vektory, které ovlivňují trasu a počet lahví.
 
 První číslo udává počet lahví, druhé počet fragmentů křivky, po které jezdí.
 

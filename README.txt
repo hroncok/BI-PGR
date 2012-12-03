@@ -38,3 +38,12 @@ Jednotlivé položky jsou odděleny libovolným množstvím whitespacu a nejsou 
 
 ---- 
 
+==== Soubory ==== 
+Soubory ve složce resources pocházejí z cvičení sceneGraph a nejsem jejich autorem (kromě MeshNode.vert a .frag, které jsem značně upravil).
+
+Ve složce data jsou modely a textury načítané za běhu programu. Jsem jejich autorem, kromě podlahy, kterou jsem našel na Google Images.
+
+Soubory v rootu jsou mé (AnimMode vychází z podobného souboru z cvičení sceneGraph, stejně jako main).
+
+---- 
+

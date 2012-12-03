@@ -38,7 +38,6 @@ const int NUM_SPOT_LIGHTS = 1;
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
 #define BOTTLE_FILE_NAME "./data/bottle/bottle.obj"
-#define PATH_FILE_NAME "./data/path/path.obj"
 
 // scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
@@ -217,17 +216,6 @@ void createTerrain() {
 	terrain_mesh_p->setGeometry(mesh_p);
 }
 
-void createPath() {
-	TransformNode* path_transform = new TransformNode("pathTranf", rootNode_p);
-	path_transform->translate(glm::vec3(0.0, -17.3, 0.0));
-	//path_transform->rotate(-90,glm::vec3(1,0,0));
-	path_transform->scale(glm::vec3(35,20,35));
-	
-	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(PATH_FILE_NAME);
-	MeshNode * path_mesh_p = new MeshNode("path", path_transform);
-	path_mesh_p->setGeometry(meshGeom_p);
-}
-
 void createBottle(int index = 0, float offset = 0.0f) {
 	// Index the names so more bottles are possible
 	std::stringstream ss; ss << index << std::flush;
@@ -324,7 +312,6 @@ void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
-	//createPath();
 	int bottles = 30;
 	for (int i=0; i < bottles; i++) {
 		createBottle(i,i*4.0/bottles);

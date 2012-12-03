@@ -225,7 +225,6 @@ void createTerrain() {
 void createStream() {
 	TransformNode* stream_transform = new TransformNode("streamTranf", rootNode_p);
 	stream_transform->translate(glm::vec3(0.0f, 70.0f, 0.0f)+AnimNode::config.points()[0]);
-	//stream_transform->rotate(-90,glm::vec3(1,0,0));
 	stream_transform->scale(glm::vec3(0.5f,100.0f,0.5f));
 
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(STREAM_FILE_NAME);
@@ -240,7 +239,6 @@ void createBottle(int index = 0, float offset = 0.0f) {
 
 	TransformNode* bottle_transform = new TransformNode("bottleTranf"+ss.str(), bottle_anim);
 	bottle_transform->translate(glm::vec3(0.0, -12.5, 0.0));
-	//bottle_transform->rotate(-90,glm::vec3(1,0,0));
 	bottle_transform->scale(glm::vec3(4));
 
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(BOTTLE_FILE_NAME);

@@ -325,8 +325,9 @@ void initializeScene() {
 	rootNode_p = new SceneNode("root");
 	createTerrain();
 	//createPath();
-	for (int i=0; i < 20; i++) {
-		createBottle(i,i*0.15f);
+	int bottles = 30;
+	for (int i=0; i < bottles; i++) {
+		createBottle(i,i*4.0/bottles);
 	}
 	// dump our scene graph tree for debug
 	rootNode_p->dump();

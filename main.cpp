@@ -42,6 +42,7 @@ const int NUM_SPOT_LIGHTS = 1;
 // file name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
 #define BOTTLE_FILE_NAME "./data/bottle/bottle.obj"
+#define STREAM_FILE_NAME "./data/stream/stream.obj"
 
 // scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
@@ -221,6 +222,17 @@ void createTerrain() {
 	terrain_mesh_p->setGeometry(mesh_p);
 }
 
+void createStream() {
+	TransformNode* stream_transform = new TransformNode("streamTranf", rootNode_p);
+	stream_transform->translate(glm::vec3(0.0f, 70.0f, 0.0f)+AnimNode::config.points()[0]);
+	//stream_transform->rotate(-90,glm::vec3(1,0,0));
+	stream_transform->scale(glm::vec3(0.5f,100.0f,0.5f));
+
+	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(STREAM_FILE_NAME);
+	MeshNode * stream_mesh_p = new MeshNode("stream", stream_transform);
+	stream_mesh_p->setGeometry(meshGeom_p);
+}
+
 void createBottle(int index = 0, float offset = 0.0f) {
 	// Index the names so more bottles are possible
 	std::stringstream ss; ss << index << std::flush;
@@ -317,6 +329,7 @@ void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
+	createStream();
 	for (int i=0; i < AnimNode::config.bottles(); i++) {
 		createBottle(i,i*float(AnimNode::config.fragments())/AnimNode::config.bottles()); // casting to float has to be done at least on one of those integers
 	}

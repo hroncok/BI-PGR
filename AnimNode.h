@@ -2,6 +2,7 @@
 #define ANIM_NODE_H
 
 #include "resources/SceneNode.h"
+#include "Configuration.h"
 
 class AnimNode : public SceneNode {
 public:
@@ -13,6 +14,7 @@ public:
 
 	void update(double elapsed_time);
 	static bool animation; // is the animation working
+	static Configuration config;
 protected:
 	glm::vec3 m_axis;
 	float m_angle;

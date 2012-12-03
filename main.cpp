@@ -22,7 +22,11 @@
 #include "resources/MeshGeometry.h"
 #include "resources/AxesNode.h" // coordinate axes
 #include "resources/ShaderProgram.h"
+// my own includes
 #include "AnimNode.h"
+#include "Configuration.h"
+
+//Configuration * conf = new Configuration;
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -47,6 +51,7 @@ float g_aspect_ratio = 1.0f;
 int g_win_w, g_win_h; // windowSize
 bool freeCam = false; // is the free camera motion available
 bool AnimNode::animation = true; // is the animation working
+Configuration AnimNode::config;
 
 /// animation time step for glutTimer
 const int TIMER_STEP = 20;   // next event in [ms]
@@ -312,9 +317,8 @@ void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
-	int bottles = 30;
-	for (int i=0; i < bottles; i++) {
-		createBottle(i,i*4.0/bottles);
+	for (int i=0; i < AnimNode::config.bottles(); i++) {
+		createBottle(i,i*float(AnimNode::config.fragments())/AnimNode::config.bottles()); // casting to float has to be done at least on one of those integers
 	}
 	// dump our scene graph tree for debug
 	rootNode_p->dump();

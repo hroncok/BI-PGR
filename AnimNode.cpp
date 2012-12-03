@@ -21,15 +21,15 @@ void AnimNode::update(double elapsed_time) {
 	F.s = pow(dec,3)-pow(dec,2);
 
 	// You can add more points and more vectors here, use the same amount of both!
-	glm::vec3 points[] = {glm::vec3(0.0f,0.0f,0.0f), glm::vec3(20.0f,0.0f,30.0f), glm::vec3(-30.0f,0.0f,0.0f), glm::vec3(15.0f,0.0f,-30.0f)};
-	glm::vec3 vectors[] = {glm::vec3(0.0f,0.0f,-50.0f), glm::vec3(50.0f,0.0f,-10.0f), glm::vec3(0.0f,0.0f,50.0f), glm::vec3(-50.0f,0.0f,0.0f)};
+	//glm::vec3 points[] = {glm::vec3(0.0f,0.0f,0.0f), glm::vec3(20.0f,0.0f,30.0f), glm::vec3(-30.0f,0.0f,0.0f), glm::vec3(15.0f,0.0f,-30.0f)};
+	//glm::vec3 vectors[] = {glm::vec3(0.0f,0.0f,-50.0f), glm::vec3(50.0f,0.0f,-10.0f), glm::vec3(0.0f,0.0f,50.0f), glm::vec3(-50.0f,0.0f,0.0f)};
 	
 	glm::vec3 start, end, startv, endv;
-	int fragments = sizeof(points)/sizeof(glm::vec3);
-	start = points[seconds%fragments];
-	startv = vectors[seconds%fragments];
-	end = points[(seconds+1)%fragments];
-	endv = -vectors[(seconds+1)%fragments];
+	//int fragments = sizeof(points)/sizeof(glm::vec3);
+	start = config.points()[seconds%config.fragments()];
+	startv = config.vectors()[seconds%config.fragments()];
+	end = config.points()[(seconds+1)%config.fragments()];
+	endv = -config.vectors()[(seconds+1)%config.fragments()];
 	
 	glm::vec3 mat3 = glm::vec3(0.0f);
 	mat3.x = start.x*F.p + end.x*F.q + startv.x*F.r + endv.x*F.s;

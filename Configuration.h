@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------------------------
+/**
+ * \file    Configuration.h
+ * \author  Miroslav Hroncok
+ * 
+ * Courswork for BI-PGR on FIT CTU.
+ * This class is used to handle config and load it form file
+ */
+//----------------------------------------------------------------------------------------
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
@@ -10,12 +19,11 @@ class Configuration {
 public:
 	Configuration(const std::string & filename = "config.txt");
 	~Configuration();
-	int bottles() {return m_bottles;}
-	int fragments() {return m_fragments;}
-	glm::vec3 * points() {return m_points;}
-	glm::vec3 * vectors() {return m_vectors;}
+	int bottles();
+	int fragments();
+	glm::vec3 * points();
+	glm::vec3 * vectors();
 protected:
-	std::ifstream * m_config;
 	int m_bottles;
 	int m_fragments;
 	glm::vec3 * m_points;

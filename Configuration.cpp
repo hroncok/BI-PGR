@@ -1,8 +1,18 @@
-
+//----------------------------------------------------------------------------------------
+/**
+ * \file    Configuration.cpp
+ * \author  Miroslav Hroncok
+ * 
+ * Courswork for BI-PGR on FIT CTU.
+ * This class is used to handle config and load it form file
+ */
+//----------------------------------------------------------------------------------------
 #include "Configuration.h"
 
+/// The constructor loads the values
+/// \param filename Filename of teh config file (config.txt is used as default)
 Configuration::Configuration(const std::string & filename) {
-	m_config = new std::ifstream(filename);
+	std::ifstream * m_config = new std::ifstream(filename);
 	if (!m_config->is_open() || !(*m_config >> m_bottles) || !(*m_config >> m_fragments)) {
 		printf("Cannot open/read config file %s\n",filename);
 		exit(1);
@@ -27,3 +37,26 @@ Configuration::~Configuration() {
 	delete(m_vectors);
 }
 
+/// Bottles getter
+/// \return Number of bottles
+int Configuration::bottles() {
+	return m_bottles;
+}
+
+/// Fragments getter
+/// \return Number of fragments on the path
+int Configuration::fragments() {
+	return m_fragments
+;}
+
+/// Points getter
+/// \return Array of points on the paths
+glm::vec3 * Configuration::points() {
+	return m_points;
+}
+
+/// Vectors getter
+/// \return Array of directional vectors for the path
+glm::vec3 * Configuration::vectors() {
+	return m_vectors;
+}

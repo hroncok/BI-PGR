@@ -2,6 +2,9 @@
 /**
  * \file    main.cpp
  * \author  Tomas Barak, Vlastimil Havran, Jaroslav Sloup, Miroslav Hroncok
+ * 
+ * Courswork for BI-PGR on FIT CTU.
+ * This file is derived from sceneGraph seminar, so I've left original authors here too.
  */
 //----------------------------------------------------------------------------------------
 
@@ -26,61 +29,84 @@
 #include "AnimNode.h"
 #include "Configuration.h"
 
-//Configuration * conf = new Configuration;
-
 #if _MSC_VER
+/// Define this for snprintf function
 #define snprintf _snprintf
 #endif
 
+/// Window title
 #define TITLE "BI-PGR"
+
+/// Initial window width
 #define WIN_WIDTH 800
+
+/// Initial window height
 #define WIN_HEIGHT 600
+
+/// Limit for free camera Pitch angle, radians
 #define PITCHLIM 1.55f // pi/2 - small
 
+/// How many spot light is used
 const int NUM_SPOT_LIGHTS = 1;
 
-// file name used during the scene graph creation
+/// File name used during the scene graph creation
 #define TERRAIN_FILE_NAME "./data/terrain"
+
+/// File name used during the scene graph creation
 #define BOTTLE_FILE_NAME "./data/bottle/bottle.obj"
+
+/// File name used during the scene graph creation
 #define STREAM_FILE_NAME "./data/stream/stream.obj"
 
-// scene graph root node
+/// File name used for stream texture
+#define STREAM_TEXTURE_FILE_NAME "./data/stream/texture.png"
+
+/// Scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
 
-// global variables
+/// Aspect ratio
 float g_aspect_ratio = 1.0f;
-int g_win_w, g_win_h; // windowSize
-bool freeCam = false; // is the free camera motion available
-bool AnimNode::animation = true; // is the animation working
+
+/// Actual window size
+int g_win_w, g_win_h;
+
+/// Determinates whether is the free camera motion available
+bool freeCam = false;
+
+/// Determinates whether is theanimation of bottles turned on
+bool AnimNode::animation = true;
+
+/// Loads and handles the config form the file
 Configuration AnimNode::config;
 
-/// animation time step for glutTimer
+/// Animation time step for glutTimer
 const int TIMER_STEP = 20;   // next event in [ms]
 
-/// use this constant when incrementing the camera pith and yaw
+/// Use this constant when incrementing the camera pith and yaw
 const float CAMERA_ROTATION_DELTA = M_PI / 100.0f;
-/// this constant is used to modify the spinAngle variable
+
+/// This constant is used to modify the spinAngle variable
 const float ROTATION_DELTA = -M_PI / 500;
-/// use this to increment the camera position
+
+/// Use this to increment the camera position
 const float MOVE_DELTA = 0.2f;
 
-/// radius of the model circle (distance from the scene center)
-const float R = 3.0f;
-/// the axis of the model rotation
-const glm::vec3 spinAxis = glm::vec3(0.0, 1.0, 0.0);
-
+/// Reflector position
 glm::vec4 reflector = glm::vec4(0.0f);
 
+/// Handles light information
 struct Light {
 	glm::vec4 ambient;
 	glm::vec4 diffuse;
 	glm::vec4 specular;
 };
 
+/// Adds directional light attributes
 struct DirectionalLight: public Light {
 	glm::vec4 direction;
 };
 
+/// Adds spot light attributes
 struct SpotLight: public Light {
 	glm::vec4 position;
 	glm::vec4 spotDirection;
@@ -88,6 +114,7 @@ struct SpotLight: public Light {
 	float spotExponent;
 };
 
+/// Some of the global variables for camera and reflector
 struct State {
 	glm::mat4 projection;
 	glm::vec3 cameraPosition;
@@ -97,8 +124,7 @@ struct State {
 	SpotLight refLights[2];
 } state;
 
-
-
+/// From lihgting seminar, used to send information to the shader
 class LightingShader: public MeshShaderProgram {
 public:
 	struct LightLocations {
@@ -138,10 +164,12 @@ public:
 	LightLocations m_lights[NUM_SPOT_LIGHTS];
 };
 
+/// From lihgting seminar, used to send information to the shader
 struct Resources {
 	LightingShader * shaderProgram;
 } resources;
 
+/// For handling time events
 void FuncTimerCallback(int) {
 	// this is from screenGraph
 	double timed = 0.001 * (double)glutGet(GLUT_ELAPSED_TIME); // milliseconds => seconds
@@ -154,6 +182,7 @@ void FuncTimerCallback(int) {
 	glutPostRedisplay();
 }
 
+/// Reloads the shader
 void reloadShader() {
 	if(resources.shaderProgram)
 		delete resources.shaderProgram;
@@ -168,19 +197,19 @@ void reloadShader() {
 	CHECK_GL_ERROR();
 }
 
+/// Turns the reflector on or off (to oposite value)
 void reflectorSwitch() {
 	if (reflector == glm::vec4(0.0f)) reflector = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
 	else  reflector = glm::vec4(0.0f);
 	glutPostRedisplay();
 }
 
+/// Turns the animation on or off (to oposite value)
 void animationSwitch() {
 	AnimNode::animation = !AnimNode::animation;
-	//glutPostRedisplay();
 }
 
-
-
+/// Basic stuff that draw things, defines the view and such
 void functionDraw() {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -208,6 +237,7 @@ void functionDraw() {
 		rootNode_p->draw(view, projection);
 }
 
+/// Creates the terrain and adds it to the scene graph
 void createTerrain() {
 	TransformNode* terrain_transform = new TransformNode("terrainTranf", rootNode_p);
 	
@@ -222,6 +252,7 @@ void createTerrain() {
 	terrain_mesh_p->setGeometry(mesh_p);
 }
 
+/// Creates the water/beer stream and adds it to the scene graph
 void createStream() {
 	TransformNode* stream_transform = new TransformNode("streamTranf", rootNode_p);
 	stream_transform->translate(glm::vec3(0.0f, 70.0f, 0.0f)+AnimNode::config.points()[0]);
@@ -232,6 +263,9 @@ void createStream() {
 	stream_mesh_p->setGeometry(meshGeom_p);
 }
 
+/// Creates the bottle and adds it to the scene graph
+/// \param index Numeric identification of the bottle
+/// \param offset Time offset of the bottle animation, where 1 represens movement between two points duration
 void createBottle(int index = 0, float offset = 0.0f) {
 	// Index the names so more bottles are possible
 	std::stringstream ss; ss << index << std::flush;
@@ -246,6 +280,7 @@ void createBottle(int index = 0, float offset = 0.0f) {
 	bottle_mesh_p->setGeometry(meshGeom_p);
 }
 
+/// Used to calculate camera direction from angles
 void calculateState(void) {
 	state.cameraDirection = glm::vec3(cos(state.cameraYaw),tan(state.cameraPitch),sin(state.cameraYaw));
 	//state.cameraDirection = glm::vec3(cos(state.cameraYaw)*cos(state.cameraPitch),sin(state.cameraPitch),sin(state.cameraYaw)*cos(state.cameraPitch));
@@ -253,12 +288,15 @@ void calculateState(void) {
 	// both acts wierd when paged up/down over the top/bottom, so it is limited by PITCHLIM constant (little less than pi/2)
 }
 
+/// Debug thing to flush camera position to the terminal in syntax usable in the code
 void flushState(void) {
 	std::cout << "state.cameraPosition = glm::vec3(" << state.cameraPosition.x << "f, " << state.cameraPosition.y << "f, " << state.cameraPosition.x << "f);"  << std::endl;
 	std::cout << "state.cameraPitch = " << state.cameraPitch << "f;"  << std::endl;
 	std::cout << "state.cameraYaw = " << state.cameraYaw << "f;"  << std::endl;
 }
 
+/// Switches the camera
+/// \param cam Numeric identification of the camera
 void switchCam(int cam) {
 	switch (cam) {
 	case 1:
@@ -283,7 +321,8 @@ void switchCam(int cam) {
 	}
 }
 
-//event processing of the menu commands
+/// Event processing of the menu commands
+/// \param item Numeric identification of the menu command
 void myMenu(int item) {
 	switch(item) {
 	case 1:
@@ -306,7 +345,7 @@ void myMenu(int item) {
 	}
 }
 
-// menu preparation
+/// Menu preparation
 void createMenu(void) {
 	int submenuID = glutCreateMenu(myMenu);
 	glutAddMenuEntry("Static 1         [B]", 1);
@@ -323,11 +362,13 @@ void createMenu(void) {
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
+/// Putts objects to the scene, creates screene graph
 void initializeScene() {
 	// create scene root node
 	rootNode_p = new SceneNode("root");
 	createTerrain();
 	createStream();
+	// calculate the offset so bottles are evanly positioned
 	for (int i=0; i < AnimNode::config.bottles(); i++) {
 		createBottle(i,i*float(AnimNode::config.fragments())/AnimNode::config.bottles()); // casting to float has to be done at least on one of those integers
 	}
@@ -335,12 +376,16 @@ void initializeScene() {
 	rootNode_p->dump();
 }
 
+/// OpenGL crap doing magic
 void display() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	functionDraw();
 	glutSwapBuffers();
 }
 
+/// Used when window size is changed
+/// \param w New window width
+/// \param h New window heigh
 void reshape (int w, int h) {
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	g_aspect_ratio = (float)w/(float)h;
@@ -348,6 +393,10 @@ void reshape (int w, int h) {
 	g_win_h = h;
 }
 
+/// Handles pressing normal keys on the keyboard
+/// \param key Pressed key value
+/// \param x Guess it's mouse coursor X coordinate, not used here
+/// \param y Guess it's mouse coursor Y coordinate, not used here
 void myKeyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 27:
@@ -380,6 +429,10 @@ void myKeyboard(unsigned char key, int x, int y) {
 	}
 }
 
+/// Handles pressing special keys on the keyboard
+/// \param specKey Pressed key special code
+/// \param x Guess it's mouse coursor X coordinate, not used here
+/// \param y Guess it's mouse coursor Y coordinate, not used here
 void mySpecialKeyboard(int specKey, int x, int y) {
 	switch (specKey) {
 	case GLUT_KEY_LEFT:
@@ -411,6 +464,8 @@ void mySpecialKeyboard(int specKey, int x, int y) {
 	glutPostRedisplay();
 }
 
+
+/// Initialise the program
 void init() {
 	initializeScene();
 	reloadShader();
@@ -425,9 +480,14 @@ void init() {
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE); // draw front faces only
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//drawTexturedQuad(state.fishMatrix, state.view, resources.fishShader, resources.fishVao, pgr::createTexture(STREAM_TEXTURE_FILE_NAME));
 	glDepthFunc(GL_LEQUAL);
 }
 
+/// Program starts here, might be mixed with init()
+/// I have no idea why something is here and something there
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitContextVersion(pgr::OGL_VER_MAJOR, pgr::OGL_VER_MINOR);

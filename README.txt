@@ -19,11 +19,11 @@ Při výběru tématu semestrální práce jsem netušil, kolik to zabere práce
 
 
 ==== Ovládání ==== 
-Scénu lze ovlivňovat za běhu pomocí kontextové nabídky (pravé tlačítko myši někam do prostoru scény). V nabídce lze přepnout kameru (dvě statické a jedna volná, která začne na současné pozici), vypnout/zapnout reflektor a/nebo animaci, případně vypsat do terminálu vývpjové informace nebo aplikaci vypnout.
+Scénu lze ovlivňovat za běhu pomocí kontextové nabídky (pravé tlačítko myši někam do prostoru scény). V nabídce lze přepnout kameru (dvě statické a jedna volná, která začne na současné pozici), vypnout/zapnout reflektor a/nebo animaci, případně vypsat do terminálu vývojové informace nebo aplikaci vypnout.
 
 Všechny položky nabídky mají u sebe uvedenou klávesovou zkratku.
 
-Při zapnuté volné kameře je pohyb po scéně realizovaný pomocí kurozorových šipek a kláves Page Up/Down.
+Při zapnuté volné kameře je pohyb po scéně realizovaný pomocí kurzorových šipek a kláves Page Up/Down.
 
 ---- 
 

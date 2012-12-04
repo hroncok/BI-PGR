@@ -126,7 +126,7 @@ struct State {
 	glm::mat4 view;
 } state;
 
-/// Ued for texturing
+/// How mony vertices are there in quad, value is obvious
 const int numQuadVertices = 4;
 
 /// Mapping the texture
@@ -261,7 +261,7 @@ void functionDraw() {
 }
 
 
-/// Used for texturing
+/// Should draw textured quad
 void drawTexturedQuad(const glm::mat4 & model, const glm::mat4 & view, const MeshShaderProgram * shader, GLuint vao, GLuint texture) {
 	glUseProgram(shader->m_programId);
 
@@ -277,7 +277,7 @@ void drawTexturedQuad(const glm::mat4 & model, const glm::mat4 & view, const Mes
 	CHECK_GL_ERROR();
 }
 
-/// Used for texturing
+/// Reloads the shader, used for texturing
 MeshShaderProgram * reloadShader(MeshShaderProgram * shader, const char * vertSrt, const char * fragSrc) {
 	if(shader)
 	delete shader;
@@ -293,7 +293,7 @@ MeshShaderProgram * reloadShader(MeshShaderProgram * shader, const char * vertSr
 	return shader;
 }
 
-/// Used for texturing
+/// Sets the shader attributes for texturing
 void setupShaderAttribsTexture(GLuint vao, GLuint vbo, MeshShaderProgram * shader) {
 	glBindVertexArray(vao);
 

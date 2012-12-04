@@ -59,7 +59,7 @@ const int NUM_SPOT_LIGHTS = 1;
 #define STREAM_FILE_NAME "./data/stream/stream.obj"
 
 /// File name used for stream texture
-#define STREAM_TEXTURE_FILE_NAME "./data/stream/texture.png"
+#define STREAM_TEXTURE_FILE_NAME "./data/stream/stream.png"
 
 /// Scene graph root node
 SceneNode * rootNode_p = NULL; // scene root
@@ -122,7 +122,30 @@ struct State {
 	float cameraPitch;
 	glm::vec3 cameraDirection;
 	SpotLight refLights[2];
+	double time;
+	glm::mat4 view;
 } state;
+
+/// Ued for texturing
+const int numQuadVertices = 4;
+
+/// Mapping the texture
+const float streamVertexData[numQuadVertices * 5] = {
+	//x  y  z  u  v
+	-1, -1, 0, 0, 0,
+	 1, -1, 0, 1, 0,
+	-1,  1, 0, 0, 1,
+	 1,  1, 0, 1, 1,
+};
+
+/// Global data about the texture
+struct Stream {
+	GLuint vbo;
+	GLuint vao;
+	GLuint texture;
+	MeshShaderProgram * shader;
+	glm::mat4 matrix;
+} stream;
 
 /// From lihgting seminar, used to send information to the shader
 class LightingShader: public MeshShaderProgram {
@@ -172,11 +195,11 @@ struct Resources {
 /// For handling time events
 void FuncTimerCallback(int) {
 	// this is from screenGraph
-	double timed = 0.001 * (double)glutGet(GLUT_ELAPSED_TIME); // milliseconds => seconds
+	state.time = 0.001 * (double)glutGet(GLUT_ELAPSED_TIME); // milliseconds => seconds
 	// ELAPSED_TIME is number of milliseconds since glutInit called 
 
 	if(rootNode_p)
-		rootNode_p->update(timed);
+		rootNode_p->update(state.time);
 
 	glutTimerFunc(33, FuncTimerCallback, 0);
 	glutPostRedisplay();
@@ -216,8 +239,8 @@ void functionDraw() {
 
 	glm::mat4 projection =  glm::perspective(60.0f, g_aspect_ratio, 1.0f, 10000.0f);
 
-	glm::mat4 view(1.0f);
-	view = glm::lookAt(state.cameraPosition,state.cameraDirection+state.cameraPosition,glm::vec3(0,1,0));
+	state.view = glm::mat4(1.0f);
+	state.view = glm::lookAt(state.cameraPosition,state.cameraDirection+state.cameraPosition,glm::vec3(0,1,0));
 
 	for(int l = 0; l < NUM_SPOT_LIGHTS; ++l) {
 		glUniform3fv(resources.shaderProgram->m_lights[l].ambient, 1, glm::value_ptr(state.refLights[l].ambient));
@@ -230,11 +253,63 @@ void functionDraw() {
 	}
 
 	// Position of the reflector
-	state.refLights[0].position = view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
-	state.refLights[0].spotDirection = view * reflector;
+	state.refLights[0].position = state.view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
+	state.refLights[0].spotDirection = state.view * reflector;
 
 	if(rootNode_p)
-		rootNode_p->draw(view, projection);
+		rootNode_p->draw(state.view, projection);
+}
+
+
+/// Used for texturing
+void drawTexturedQuad(const glm::mat4 & model, const glm::mat4 & view, const MeshShaderProgram * shader, GLuint vao, GLuint texture) {
+	glUseProgram(shader->m_programId);
+
+	glm::mat4 PVMmatrix = state.projection  * view * model;
+	glUniformMatrix4fv(shader->m_PVMmatrix, 1, GL_FALSE, glm::value_ptr(PVMmatrix));        // model-view-projection
+	glUniformMatrix4fv(shader->m_Vmatrix, 1, GL_FALSE, glm::value_ptr(view));               // view
+	glUniform1f(shader->m_time, state.time);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, numQuadVertices);
+
+	CHECK_GL_ERROR();
+}
+
+/// Used for texturing
+MeshShaderProgram * reloadShader(MeshShaderProgram * shader, const char * vertSrt, const char * fragSrc) {
+	if(shader)
+	delete shader;
+
+	GLuint shaderList[] = {
+		pgr::createShaderFromFile(GL_VERTEX_SHADER,   vertSrt),
+		pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fragSrc),
+		0
+	};
+	shader = new MeshShaderProgram(pgr::createProgram(shaderList));
+	shader->initLocations();
+	CHECK_GL_ERROR();
+	return shader;
+}
+
+/// Used for texturing
+void setupShaderAttribsTexture(GLuint vao, GLuint vbo, MeshShaderProgram * shader) {
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	if(shader->m_pos > -1) {
+		glEnableVertexAttribArray(shader->m_pos);
+		glVertexAttribPointer(shader->m_pos, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
+	}
+
+	if(shader->m_texCoord > -1) 	{
+		glEnableVertexAttribArray(shader->m_texCoord);
+		glVertexAttribPointer(shader->m_texCoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT)));
+	}
+
+	glBindVertexArray( 0 );
+	CHECK_GL_ERROR();
 }
 
 /// Creates the terrain and adds it to the scene graph
@@ -261,6 +336,16 @@ void createStream() {
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(STREAM_FILE_NAME);
 	MeshNode * stream_mesh_p = new MeshNode("stream", stream_transform);
 	stream_mesh_p->setGeometry(meshGeom_p);
+
+	/*stream.texture = pgr::createTexture(STREAM_TEXTURE_FILE_NAME);
+	stream.shader = reloadShader(stream.shader, "stream.vert", "stream.frag");
+	glGenVertexArrays(1, &stream.vao);
+	glGenBuffers(1, &stream.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, stream.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(streamVertexData), streamVertexData, GL_STATIC_DRAW);
+	setupShaderAttribsTexture(stream.vao, stream.vbo, stream.shader);
+	stream.matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.7f, -6.5f));
+	stream.matrix = glm::scale(stream.matrix, glm::vec3(2.0f, 3.0f, 1.0f));*/
 }
 
 /// Creates the bottle and adds it to the scene graph
@@ -482,7 +567,6 @@ void init() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//drawTexturedQuad(state.fishMatrix, state.view, resources.fishShader, resources.fishVao, pgr::createTexture(STREAM_TEXTURE_FILE_NAME));
 	glDepthFunc(GL_LEQUAL);
 }
 

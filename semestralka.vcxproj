@@ -108,6 +108,8 @@
     <None Include="README.txt" />
     <None Include="resources/MeshNode.frag" />
     <None Include="resources/MeshNode.vert" />
+    <None Include="stream.frag" />
+    <None Include="stream.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

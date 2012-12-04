@@ -37,7 +37,7 @@ void AnimNode::update(double elapsed_time) {
 	start = config.points()[seconds%config.fragments()];
 	startv = config.vectors()[seconds%config.fragments()];
 	end = config.points()[(seconds+1)%config.fragments()];
-	endv = -config.vectors()[(seconds+1)%config.fragments()];
+	endv = config.vectors()[(seconds+1)%config.fragments()];
 	
 	// Calculate current position
 	glm::vec3 mat3 = glm::vec3(0.0f);

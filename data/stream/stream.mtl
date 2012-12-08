@@ -8,5 +8,6 @@ Ks 0.311111 0.311111 0.311111
 Ni 1.000000
 d 0.722222
 illum 2
+map_Kd texture.png
 
 

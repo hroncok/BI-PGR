@@ -591,6 +591,7 @@ void loadCubeMap( const char * baseFileName ) {
 void init() {
 	initializeScene();
 	reloadShader();
+	loadCubeMap("data/cubemap/texture");
 	state.refLights[0].ambient = glm::vec4(0.0f);
 	state.refLights[0].diffuse = glm::vec4(1.0f);
 	state.refLights[0].specular = glm::vec4(1.0f);
@@ -606,7 +607,7 @@ void init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
 
-	loadCubeMap("data/cubemap/texture");
+	
 }
 
 /// Program starts here, might be mixed with init()

@@ -4,6 +4,7 @@ uniform mat4 PVMmatrix;    // Projection * View * Model  --> model to clip coord
 uniform mat4 Vmatrix;      // View                       --> world to eye coordinates
 uniform mat4 Mmatrix;      // Model                      --> model to world coordinates
 uniform mat4 NormalMatrix; // inverse transposed VMmatrix
+//uniform float time;
 
 in vec3 position;     // vertex position in world space
 in vec3 normal;       // vertex normal
@@ -28,5 +29,7 @@ void main() {
   normal_v   = VMnormal;
   position_v = VMposition.xyz;
 
+  //vec2 offset = vec2(0.0f,time/5); // using this works with the floor, but not with the stream, screw it
+  //texCoord_v = texCoord + offset;
   texCoord_v = texCoord;
 }

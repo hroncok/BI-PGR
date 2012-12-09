@@ -126,26 +126,6 @@ struct State {
 	glm::mat4 view;
 } state;
 
-/// How mony vertices are there in quad, value is obvious
-const int numQuadVertices = 4;
-
-/// Mapping the texture
-const float streamVertexData[numQuadVertices * 5] = {
-	//x  y  z  u  v
-	-1, -1, 0, 0, 0,
-	 1, -1, 0, 1, 0,
-	-1,  1, 0, 0, 1,
-	 1,  1, 0, 1, 1,
-};
-
-/// Global data about the texture
-struct Stream {
-	GLuint vbo;
-	GLuint vao;
-	GLuint texture;
-	MeshShaderProgram * shader;
-	glm::mat4 matrix;
-} stream;
 
 /// From lihgting seminar, used to send information to the shader
 class LightingShader: public MeshShaderProgram {
@@ -260,23 +240,6 @@ void functionDraw() {
 		rootNode_p->draw(state.view, projection);
 }
 
-
-/// Should draw textured quad
-void drawTexturedQuad(const glm::mat4 & model, const glm::mat4 & view, const MeshShaderProgram * shader, GLuint vao, GLuint texture) {
-	glUseProgram(shader->m_programId);
-
-	glm::mat4 PVMmatrix = state.projection  * view * model;
-	glUniformMatrix4fv(shader->m_PVMmatrix, 1, GL_FALSE, glm::value_ptr(PVMmatrix));        // model-view-projection
-	glUniformMatrix4fv(shader->m_Vmatrix, 1, GL_FALSE, glm::value_ptr(view));               // view
-	glUniform1f(shader->m_time, state.time);
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, numQuadVertices);
-
-	CHECK_GL_ERROR();
-}
-
 /// Reloads the shader, used for texturing
 MeshShaderProgram * reloadShader(MeshShaderProgram * shader, const char * vertSrt, const char * fragSrc) {
 	if(shader)
@@ -336,16 +299,6 @@ void createStream() {
 	MeshGeometry* meshGeom_p = MeshManager::Instance()->get(STREAM_FILE_NAME);
 	MeshNode * stream_mesh_p = new MeshNode("stream", stream_transform);
 	stream_mesh_p->setGeometry(meshGeom_p);
-
-	/*stream.texture = pgr::createTexture(STREAM_TEXTURE_FILE_NAME);
-	stream.shader = reloadShader(stream.shader, "stream.vert", "stream.frag");
-	glGenVertexArrays(1, &stream.vao);
-	glGenBuffers(1, &stream.vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, stream.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(streamVertexData), streamVertexData, GL_STATIC_DRAW);
-	setupShaderAttribsTexture(stream.vao, stream.vbo, stream.shader);
-	stream.matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.7f, -6.5f));
-	stream.matrix = glm::scale(stream.matrix, glm::vec3(2.0f, 3.0f, 1.0f));*/
 }
 
 /// Creates the bottle and adds it to the scene graph

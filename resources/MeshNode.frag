@@ -119,5 +119,6 @@ void main()
   
   vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
   //outputColor = mix(outputColor, cubeMapColor, reflectFactor);
+  //outputColor = cubeMapColor;
   color_f = outputColor;
 }

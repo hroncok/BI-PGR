@@ -98,7 +98,7 @@ void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_
   glUniform1f( m_program->m_time, m_time );        // in seconds
   // cubemap
   glUniform1f( m_program->m_reflectFactor, 0.75f);
-  glUniform1i(m_program->m_cubeMapTex, 0);
+  glUniform1i(m_program->m_cubeMapTex, 3);
   glUniform3fv(m_program->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
 
   //glUniform1i(m_texSamplerID, 0);

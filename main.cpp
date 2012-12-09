@@ -513,6 +513,7 @@ void loadCubeMap( const char * baseFileName ) {
 
   glGenTextures(1, &texID);
   glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+  //std::cout << texID << std::endl;
 
  const char * suffixes[] = { "posx", "negx", "posy", "negy", "posz", "negz" };
   GLuint targets[] = {

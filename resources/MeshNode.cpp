@@ -86,6 +86,7 @@ void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_
   glm::mat4   Vmatrix = view_matrix;
   glm::mat4   Mmatrix = globalMatrix();
 
+
   glUseProgram(m_program->m_programId);
 
   glUniformMatrix4fv(m_program->m_PVMmatrix, 1, GL_FALSE, glm::value_ptr(PVMmatrix) );			// model-view-projection
@@ -95,6 +96,10 @@ void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_
   glUniformMatrix4fv(m_program->m_NormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix) );    // correct matrix for non-rigid transf
 
   glUniform1f( m_program->m_time, m_time );        // in seconds
+  // cubemap
+  glUniform1f( m_program->m_reflectFactor, 0.75f);
+  glUniform1i(m_program->m_cubeMapTex, 0);
+  glUniform3fv(m_program->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
 
   //glUniform1i(m_texSamplerID, 0);
 

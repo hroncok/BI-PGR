@@ -24,6 +24,11 @@ void BasicShaderProgram::initLocations()
   m_NormalMatrix =  glGetUniformLocation(m_programId, "NormalMatrix");
 
   m_time         =  glGetUniformLocation(m_programId, "time" );
+
+  // cubemap
+  m_cubeMapTex = glGetUniformLocation(m_programId, "cubeMapTex");
+  m_worldCameraPosition = glGetUniformLocation(m_programId, "worldCameraPosition");
+  m_reflectFactor = glGetUniformLocation(m_programId, "reflectFactor");
 }
 
 void BasicShaderProgram::updateUniforms(SceneNode *nd)

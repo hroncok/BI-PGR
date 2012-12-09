@@ -173,7 +173,6 @@ public:
 /// From lihgting seminar, used to send information to the shader
 struct Resources {
 	LightingShader * shaderProgram;
-	GLuint shaderProgramInt;
 } resources;
 
 /// For handling time events
@@ -200,8 +199,7 @@ void reloadShader() {
 		0
 	};
 	
-	resources.shaderProgramInt = pgr::createProgram(shaderList);
-	resources.shaderProgram = new LightingShader(resources.shaderProgramInt);
+	resources.shaderProgram = new LightingShader(pgr::createProgram(shaderList));
 	resources.shaderProgram->initLocations();
 	CHECK_GL_ERROR();
 }
@@ -574,7 +572,7 @@ void loadCubeMap( const char * baseFileName ) {
   glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
   CHECK_GL_ERROR();
 
-  GLint cubeMapTexLoc= glGetUniformLocation(resources.shaderProgramInt, "cubeMapTex");
+  /*GLint cubeMapTexLoc= glGetUniformLocation(resources.shaderProgramInt, "cubeMapTex");
   GLint worldCameraPositionLoc = glGetUniformLocation(resources.shaderProgramInt, "worldCameraPosition");
   GLint reflectFactorLoc = glGetUniformLocation(resources.shaderProgramInt, "reflectFactor");
 
@@ -582,7 +580,7 @@ void loadCubeMap( const char * baseFileName ) {
 
   glUniform1i(cubeMapTexLoc, 0);
   glUniform3fv(worldCameraPositionLoc, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
-  glUniform1f( reflectFactorLoc, 0.75f);
+  glUniform1f( reflectFactorLoc, 0.75f);*/
 
   CHECK_GL_ERROR();
 }
@@ -590,8 +588,8 @@ void loadCubeMap( const char * baseFileName ) {
 /// Initialise the program
 void init() {
 	initializeScene();
-	reloadShader();
 	loadCubeMap("data/cubemap/texture");
+	reloadShader();
 	state.refLights[0].ambient = glm::vec4(0.0f);
 	state.refLights[0].diffuse = glm::vec4(1.0f);
 	state.refLights[0].specular = glm::vec4(1.0f);

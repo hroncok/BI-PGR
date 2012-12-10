@@ -114,19 +114,11 @@ void main()
   outputColor += directionalLight(sun, material, position_v, normal);
   outputColor += spotLight(reflight, material, position_v, normal);
   
-  if(useTexture) {
-    //outputColor =  outputColor;
+  if(useTexture)
     outputColor =  outputColor * texture2D(texSampler, texCoord_v);
-  } else {
-    vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
-    outputColor = mix(outputColor, cubeMapColor, reflectFactor);
-  }
 
-  //vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
-  //outputColor = mix(outputColor, cubeMapColor, reflectFactor);
-
-  //outputColor = cubeMapColor;
-  
+  vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
+  outputColor = mix(outputColor, cubeMapColor, material.shininess/256);
 
   color_f = outputColor;
 }

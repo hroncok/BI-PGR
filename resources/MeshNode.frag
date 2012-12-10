@@ -113,13 +113,20 @@ void main()
   // accumulate contributions from all lights
   outputColor += directionalLight(sun, material, position_v, normal);
   outputColor += spotLight(reflight, material, position_v, normal);
-
-  if(useTexture)
-    outputColor =  outputColor * texture(texSampler, texCoord_v);
   
-  vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
+  if(useTexture) {
+    //outputColor =  outputColor;
+    outputColor =  outputColor * texture2D(texSampler, texCoord_v);
+  } else {
+    vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
+    outputColor = mix(outputColor, cubeMapColor, reflectFactor);
+  }
+
+  //vec4 cubeMapColor = texture(cubeMapTex, reflectDir);
   //outputColor = mix(outputColor, cubeMapColor, reflectFactor);
-  //outputColor = mix(outputColor, cubeMapColor, 0.5f);
-  outputColor = cubeMapColor;
+
+  //outputColor = cubeMapColor;
+  
+
   color_f = outputColor;
 }

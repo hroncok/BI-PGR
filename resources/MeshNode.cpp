@@ -22,7 +22,6 @@ void MeshNode::loadProgram()
 {
   if(m_program)
     ShaderManager::Instance()->release("MeshNode-shader");
-
   if(!ShaderManager::Instance()->exists("MeshNode-shader"))
   {
     GLuint shaderList[] = {
@@ -30,7 +29,6 @@ void MeshNode::loadProgram()
       pgr::createShaderFromFile(GL_FRAGMENT_SHADER, "resources/MeshNode.frag"),
       0
     };
-
     m_program = new MeshShaderProgram(pgr::createProgram(shaderList));
     ShaderManager::Instance()->insert("MeshNode-shader", m_program);
   }
@@ -97,9 +95,9 @@ void MeshNode::draw(const glm::mat4 & view_matrix, const glm::mat4 & projection_
 
   glUniform1f( m_program->m_time, m_time );        // in seconds
   // cubemap
-  glUniform1f( m_program->m_reflectFactor, 0.75f);
-  glUniform1i(m_program->m_cubeMapTex, 3);
-  glUniform3fv(m_program->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
+  //glUniform1f( m_program->m_reflectFactor, 0.75f);
+  //glUniform1i(m_program->m_cubeMapTex, 3);
+  //glUniform3fv(m_program->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
 
   //glUniform1i(m_texSamplerID, 0);
 

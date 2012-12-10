@@ -25,10 +25,6 @@ void BasicShaderProgram::initLocations()
 
   m_time         =  glGetUniformLocation(m_programId, "time" );
 
-  // cubemap
-  m_cubeMapTex = glGetUniformLocation(m_programId, "cubeMapTex");
-  m_worldCameraPosition = glGetUniformLocation(m_programId, "worldCameraPosition");
-  m_reflectFactor = glGetUniformLocation(m_programId, "reflectFactor");
 }
 
 void BasicShaderProgram::updateUniforms(SceneNode *nd)
@@ -45,7 +41,10 @@ MeshShaderProgram::MeshShaderProgram(GLuint prId):
   m_pos(-1),
   m_normal(-1),
   m_texCoord(-1),
-  m_useTexture(-1)
+  m_useTexture(-1),
+  m_cubeMapTex(-1),
+  m_worldCameraPosition(-1),
+  m_reflectFactor(-1)
 {
 }
 
@@ -63,6 +62,12 @@ void MeshShaderProgram::initLocations()
 
   m_texSampler   = glGetUniformLocation(m_programId, "texSampler");
   m_useTexture   = glGetUniformLocation( m_programId, "useTexture");
+
+  
+  // cubemap
+  m_cubeMapTex = glGetUniformLocation(m_programId, "cubeMapTex");
+  m_worldCameraPosition = glGetUniformLocation(m_programId, "worldCameraPosition");
+  m_reflectFactor = glGetUniformLocation(m_programId, "reflectFactor");
 
   BasicShaderProgram::initLocations();
 }

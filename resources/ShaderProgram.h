@@ -27,10 +27,7 @@ public:
 
   /// elapsed time in miliseconds ation
   GLint m_time;
-  // cubemap
-  GLint m_cubeMapTex;
-  GLint m_worldCameraPosition;
-  GLint m_reflectFactor;
+
 };
 
 class MeshShaderProgram: public BasicShaderProgram
@@ -55,6 +52,10 @@ public:
   GLint m_normal;
   GLint m_texCoord;
   GLint m_useTexture;
+  // cubemap
+  GLint m_cubeMapTex;
+  GLint m_worldCameraPosition;
+  GLint m_reflectFactor;
 };
 
 #endif // SHADERPROGRAM_H

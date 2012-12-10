@@ -226,6 +226,9 @@ void functionDraw() {
 	state.view = glm::mat4(1.0f);
 	state.view = glm::lookAt(state.cameraPosition,state.cameraDirection+state.cameraPosition,glm::vec3(0,1,0));
 
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+
 	for(int l = 0; l < NUM_SPOT_LIGHTS; ++l) {
 		glUniform3fv(resources.shaderProgram->m_lights[l].ambient, 1, glm::value_ptr(state.refLights[l].ambient));
 		glUniform3fv(resources.shaderProgram->m_lights[l].diffuse, 1, glm::value_ptr(state.refLights[l].diffuse));
@@ -236,47 +239,16 @@ void functionDraw() {
 		glUniform1f(resources.shaderProgram->m_lights[l].spotExponent, state.refLights[l].spotExponent);
 	}
 
+	glUniform1f(resources.shaderProgram->m_reflectFactor, 0.75f);
+	//glUniform1i(resources.shaderProgram->m_cubeMapTex, texID);
+	glUniform3fv(resources.shaderProgram->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
+
 	// Position of the reflector
 	state.refLights[0].position = state.view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
 	state.refLights[0].spotDirection = state.view * reflector;
 
 	if(rootNode_p)
 		rootNode_p->draw(state.view, projection);
-}
-
-/// Reloads the shader, used for texturing
-MeshShaderProgram * reloadShader(MeshShaderProgram * shader, const char * vertSrt, const char * fragSrc) {
-	if(shader)
-	delete shader;
-
-	GLuint shaderList[] = {
-		pgr::createShaderFromFile(GL_VERTEX_SHADER,   vertSrt),
-		pgr::createShaderFromFile(GL_FRAGMENT_SHADER, fragSrc),
-		0
-	};
-	shader = new MeshShaderProgram(pgr::createProgram(shaderList));
-	shader->initLocations();
-	CHECK_GL_ERROR();
-	return shader;
-}
-
-/// Sets the shader attributes for texturing
-void setupShaderAttribsTexture(GLuint vao, GLuint vbo, MeshShaderProgram * shader) {
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	if(shader->m_pos > -1) {
-		glEnableVertexAttribArray(shader->m_pos);
-		glVertexAttribPointer(shader->m_pos, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), 0);
-	}
-
-	if(shader->m_texCoord > -1) 	{
-		glEnableVertexAttribArray(shader->m_texCoord);
-		glVertexAttribPointer(shader->m_texCoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT)));
-	}
-
-	glBindVertexArray( 0 );
-	CHECK_GL_ERROR();
 }
 
 /// Creates the terrain and adds it to the scene graph
@@ -570,17 +542,17 @@ void loadCubeMap( const char * baseFileName ) {
   glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   // unbind the texture (just in case someone will mess up with texture calls later)
-  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
   CHECK_GL_ERROR();
 
-  /*GLint cubeMapTexLoc= glGetUniformLocation(resources.shaderProgramInt, "cubeMapTex");
-  GLint worldCameraPositionLoc = glGetUniformLocation(resources.shaderProgramInt, "worldCameraPosition");
-  GLint reflectFactorLoc = glGetUniformLocation(resources.shaderProgramInt, "reflectFactor");
+  //GLint cubeMapTexLoc= glGetUniformLocation(resources.shaderProgram->m_programId, "cubeMapTex");
+  /*GLint worldCameraPositionLoc = glGetUniformLocation(resources.shaderProgram->m_programId, "worldCameraPosition");
+  GLint reflectFactorLoc = glGetUniformLocation(resources.shaderProgram->m_programId, "reflectFactor");*/
 
-  glUseProgram(resources.shaderProgramInt);
+  //glUseProgram(resources.shaderProgram->m_programId);
 
-  glUniform1i(cubeMapTexLoc, 0);
-  glUniform3fv(worldCameraPositionLoc, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
+  //glUniform1i(cubeMapTexLoc, texID);
+  /*glUniform3fv(worldCameraPositionLoc, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
   glUniform1f( reflectFactorLoc, 0.75f);*/
 
   CHECK_GL_ERROR();
@@ -588,9 +560,11 @@ void loadCubeMap( const char * baseFileName ) {
 
 /// Initialise the program
 void init() {
-	initializeScene();
-	loadCubeMap("data/cubemap/texture");
 	reloadShader();
+	loadCubeMap("data/cubemap/texture");
+	
+	initializeScene();
+	
 	state.refLights[0].ambient = glm::vec4(0.0f);
 	state.refLights[0].diffuse = glm::vec4(1.0f);
 	state.refLights[0].specular = glm::vec4(1.0f);

@@ -239,7 +239,7 @@ void functionDraw() {
 		glUniform1f(resources.shaderProgram->m_lights[l].spotExponent, state.refLights[l].spotExponent);
 	}
 
-	glUniform1f(resources.shaderProgram->m_reflectFactor, 0.2f);
+	//glUniform1f(resources.shaderProgram->m_reflectFactor, 0.2f);
 	glUniform1i(resources.shaderProgram->m_cubeMapTex, 1);
 	glUniform3fv(resources.shaderProgram->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
 

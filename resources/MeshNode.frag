@@ -26,7 +26,7 @@ smooth in vec3 normal_v;    // camera space normal
 smooth in vec3 position_v;  // camera space fragment position
 noperspective in vec3 reflectDir;
 uniform samplerCube cubeMapTex;
-uniform float reflectFactor;
+//uniform float reflectFactor;
 
 
 uniform float     time;         // used for simulation of moving lights (such as sun)

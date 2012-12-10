@@ -55,7 +55,7 @@ public:
   // cubemap
   GLint m_cubeMapTex;
   GLint m_worldCameraPosition;
-  GLint m_reflectFactor;
+  //GLint m_reflectFactor;
 };
 
 #endif // SHADERPROGRAM_H

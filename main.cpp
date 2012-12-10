@@ -241,7 +241,8 @@ void functionDraw() {
 
 	//glUniform1f(resources.shaderProgram->m_reflectFactor, 0.2f);
 	glUniform1i(resources.shaderProgram->m_cubeMapTex, 1);
-	glUniform3fv(resources.shaderProgram->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
+	//glUniform3fv(resources.shaderProgram->m_worldCameraPosition, 1, glm::value_ptr(state.cameraPosition));
+	//glUniform3fv(resources.shaderProgram->m_worldCameraPosition, 1, glm::value_ptr(glm::vec3(0.0f)));
 
 	// Position of the reflector
 	state.refLights[0].position = state.view * glm::vec4(1.0f, 20.0f, 1.0f, 1.0f);
@@ -377,7 +378,8 @@ void createMenu(void) {
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-/// Cubemap crap
+/// Cubemap from cubemap example
+/// \author Tomas Barak & Jaroslav Sloup
 void loadCubeMap( const char * baseFileName ) {
 	
   glActiveTexture(GL_TEXTURE1);

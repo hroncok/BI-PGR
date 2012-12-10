@@ -54,7 +54,7 @@ public:
   GLint m_useTexture;
   // cubemap
   GLint m_cubeMapTex;
-  GLint m_worldCameraPosition;
+  //GLint m_worldCameraPosition;
   //GLint m_reflectFactor;
 };
 

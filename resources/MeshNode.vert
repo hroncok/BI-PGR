@@ -15,7 +15,7 @@ smooth out vec3 position_v;  // camera space fragment position
 in vec2 texCoord;			// incoming texture coordinates
 smooth out vec2 texCoord_v;	// outgoing texture coordinates
 noperspective out vec3 reflectDir;
-uniform vec3 worldCameraPosition;
+//uniform vec3 worldCameraPosition;
 
 void main() {
 
@@ -33,6 +33,6 @@ void main() {
   //vec2 offset = vec2(0.0f,time/5); // using this works with the floor, but not with the stream, screw it
   //texCoord_v = texCoord + offset;
   texCoord_v = texCoord;
-  vec3 worldView = normalize(worldCameraPosition - position);
+  vec3 worldView = normalize(position);
   reflectDir = reflect(-worldView, normal);
 }

@@ -381,82 +381,68 @@ void createMenu(void) {
 /// Cubemap from cubemap example
 /// \author Tomas Barak & Jaroslav Sloup
 void loadCubeMap( const char * baseFileName ) {
+	glActiveTexture(GL_TEXTURE1);
 	
-  glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+	
+	const char * suffixes[] = { "posx", "negx", "posy", "negy", "posz", "negz" };
+	GLuint targets[] = {
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
 
-  glGenTextures(1, &texID);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
-  //std::cout << texID << std::endl;
+	for( int i = 0; i < 6; i++ ) {
+		std::string texName = std::string(baseFileName) + "_" + suffixes[i] + ".jpg";
+		std::cout << "Loading: " << texName << std::endl;
+		
+		// DevIL library has to be initialized (ilInit() must be called)
+		// DevIL uses mechanism similar to OpenGL, each image has its ID (name)
+		ILuint img_id;
+		ilGenImages(1, &img_id); // generate one image ID (name)
+		ilBindImage(img_id); // bind that generated id
+		
+		// set origin to LOWER LEFT corner (the orientation which OpenGL uses)
+		ilEnable(IL_ORIGIN_SET);
+		ilSetInteger(IL_ORIGIN_MODE, IL_ORIGIN_LOWER_LEFT);
+		
+		// this will load image data to the currently bound image
+		if(ilLoadImage(texName.c_str()) == IL_FALSE) {
+			ilDeleteImages(1, &img_id);
+			std::cerr << __FUNCTION__ << " cannot load image " << texName << std::endl;
+			return;
+		}
+		
+		// if the image was correctly loaded, we can obtain some informatins about our image
+		ILint width = ilGetInteger(IL_IMAGE_WIDTH);
+		ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
+		ILenum format = ilGetInteger(IL_IMAGE_FORMAT);
+		// there are many possible image formats and data types
+		// we will convert all image types to RGB or RGBA format, with one byte per channel
+		unsigned Bpp = ((format == IL_RGBA || format == IL_BGRA) ? 4 : 3);
+		char * data = new char[width * height * Bpp];
+		// this will convert image to RGB or RGBA, one byte per channel and store data to our array
+		ilCopyPixels(0, 0, 0, width, height, 1, Bpp == 4 ? IL_RGBA : IL_RGB, IL_UNSIGNED_BYTE, data);
+		// image data has been copied, we dont need the DevIL object anymore
+		ilDeleteImages(1, &img_id);
+		
+		// bogus ATI drivers may require this call to work with mipmaps
+		//glEnable(GL_TEXTURE_2D);
+		
+		// upload our image data to OpenGL
+		glTexImage2D(targets[i], 0, Bpp == 4 ? GL_RGBA : GL_RGB, width, height, 0, Bpp == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+	}
+	
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
- const char * suffixes[] = { "posx", "negx", "posy", "negy", "posz", "negz" };
-  GLuint targets[] = {
-    GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-    GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-    GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-  };
-
-  for( int i = 0; i < 6; i++ ) {
-    std::string texName = std::string(baseFileName) + "_" + suffixes[i] + ".jpg";
-    std::cout << "Loading: " << texName << std::endl;
-
-    // DevIL library has to be initialized (ilInit() must be called)
-    // DevIL uses mechanism similar to OpenGL, each image has its ID (name)
-    ILuint img_id;
-    ilGenImages(1, &img_id); // generate one image ID (name)
-    ilBindImage(img_id); // bind that generated id
-
-    // set origin to LOWER LEFT corner (the orientation which OpenGL uses)
-    ilEnable(IL_ORIGIN_SET);
-    ilSetInteger(IL_ORIGIN_MODE, IL_ORIGIN_LOWER_LEFT);
-
-    // this will load image data to the currently bound image
-    if(ilLoadImage(texName.c_str()) == IL_FALSE) {
-      ilDeleteImages(1, &img_id);
-      std::cerr << __FUNCTION__ << " cannot load image " << texName << std::endl;
-      return;
-    }
-
-    // if the image was correctly loaded, we can obtain some informatins about our image
-    ILint width = ilGetInteger(IL_IMAGE_WIDTH);
-    ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
-    ILenum format = ilGetInteger(IL_IMAGE_FORMAT);
-    // there are many possible image formats and data types
-    // we will convert all image types to RGB or RGBA format, with one byte per channel
-    unsigned Bpp = ((format == IL_RGBA || format == IL_BGRA) ? 4 : 3);
-    char * data = new char[width * height * Bpp];
-    // this will convert image to RGB or RGBA, one byte per channel and store data to our array
-    ilCopyPixels(0, 0, 0, width, height, 1, Bpp == 4 ? IL_RGBA : IL_RGB, IL_UNSIGNED_BYTE, data);
-    // image data has been copied, we dont need the DevIL object anymore
-    ilDeleteImages(1, &img_id);
-
-    // bogus ATI drivers may require this call to work with mipmaps
-    //glEnable(GL_TEXTURE_2D);
-
-    // upload our image data to OpenGL
-    glTexImage2D(targets[i], 0, Bpp == 4 ? GL_RGBA : GL_RGB, width, height, 0, Bpp == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
-  }
-
-  glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-  // unbind the texture (just in case someone will mess up with texture calls later)
-  glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
-  CHECK_GL_ERROR();
-
-  //GLint cubeMapTexLoc= glGetUniformLocation(resources.shaderProgram->m_programId, "cubeMapTex");
-  /*GLint worldCameraPositionLoc = glGetUniformLocation(resources.shaderProgram->m_programId, "worldCameraPosition");
-  GLint reflectFactorLoc = glGetUniformLocation(resources.shaderProgram->m_programId, "reflectFactor");*/
-
-  //glUseProgram(resources.shaderProgram->m_programId);
-
-  //glUniform1i(cubeMapTexLoc, texID);
-  /*glUniform3fv(worldCameraPositionLoc, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f, 0.0f)));
-  glUniform1f( reflectFactorLoc, 0.75f);*/
-
-  CHECK_GL_ERROR();
+	// unbind the texture (just in case someone will mess up with texture calls later)
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+	CHECK_GL_ERROR();
 }
 
 
